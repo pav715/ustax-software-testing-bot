@@ -3,7 +3,7 @@ import os
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "8714105853:AAEBU3JWHAV8mk17MjSLTYh8W2QO2I-1cts")
 CHAT_ID   = os.environ.get("CHAT_ID", "-1004378631673")  # US Tax Software Testing Jobs channel
 
-# Search terms - BROAD keywords to get maximum jobs
+# Search terms - BROAD keywords to get maximum jobs (50+)
 # Actual filtering happens in run_once.py by description (3+ keywords required)
 KEYWORDS = [
     "US tax", "US taxation", "tax", "taxation",
@@ -24,6 +24,13 @@ KEYWORDS = [
     "tax regulations", "tax law", "irs regulations",
     "tax deductions", "tax credits", "tax withholding",
     "1099", "w-2", "schedule", "tax reporting",
+    "tax associate", "tax executive", "tax officer",
+    "form 990", "form 1041", "form 1065",
+    "tax compliance officer", "tax operations", "tax processing",
+    "tax delivery", "tax services", "tax solutions",
+    "tax audit", "tax examination", "tax verification",
+    "indirect tax", "estate tax", "trust tax",
+    "tax documentation", "tax records", "tax filing software",
 ]
 
 # India cities ONLY - metro + tier-2 cities
