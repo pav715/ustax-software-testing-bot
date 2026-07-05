@@ -3,39 +3,10 @@ import os
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "8714105853:AAEBU3JWHAV8mk17MjSLTYh8W2QO2I-1cts")
 CHAT_ID   = os.environ.get("CHAT_ID", "-1004378631673")  # US Tax Software Testing Jobs channel
 
-# Search keywords organized by POSITION (1-20) across all 8 sections
-# Bot checks position-wise: if description has keywords from same position → POST
+# ONE mega search query with all 100 keywords (LinkedIn searches for ANY match)
+# Much faster: 1 search per location instead of 100 searches
 KEYWORDS = [
-    # POSITION 1 from each section
-    "ATS", "XML", "Lacerte", "Form 1040", "Software QA", "Java", "AI Tool Development", "Tax Compliance",
-    # POSITION 2
-    "E-File", "XSD", "ProSeries", "Form 1041", "Manual Testing", "Delphi XE5", "MCP", "Regulatory Compliance",
-    # POSITION 3
-    "EFile", "XML Schema", "GoSystem", "Form 1120", "Regression Testing", "GitHub", "Claude AI", "State Tax Regulations",
-    # POSITION 4
-    "ATS Submission", "XSD Schema", "ONESOURCE", "Form 1120S", "Functional Testing", "Jira", "LaserMap MCP", "Federal Tax Regulations",
-    # POSITION 5
-    "E-File Approval", "Schema Validation", "UltraTax", "Form 1065", "UAT", "Visual Studio", "TAP AI Assistant", "IRS Compliance",
-    # POSITION 6
-    "Print Approval", "XML Tagging", "CCH Axcess", "Form 990", "Test Cases", "LaserMap", "BRMS", "DOR",
-    # POSITION 7
-    "E-File Compliance", "Schema Mapping", "ProSystem fx", "Schedule K-1", "Test Scenarios", "2D Barcode", "AI Automation", "Department of Revenue",
-    # POSITION 8
-    "Print Compliance", "Schema Development", "Drake", "Individual Tax", "Bug Tracking", "GFS", "Workflow Automation", "Tax Form Development",
-    # POSITION 9
-    "State E-File", "Schema Testing", "ATX", "Corporate Tax", "Defect Management", "OSI", "", "Filing Product",
-    # POSITION 10
-    "Federal E-File", "Schema Updates", "TaxWise", "Partnership Tax", "Pre-Production Testing", "ODT", "", "Data Conversion",
-    # POSITION 11
-    "ATS Test Client", "XMLSpy", "", "", "", "", "", "Tax Law Changes",
-    # POSITION 12
-    "E-File Authorization", "Altova XMLSpy", "", "", "", "", "", "Government Liaison",
-    # POSITION 13
-    "State Authority Approval", "XML Output Validation", "", "", "", "", "", "",
-    # POSITION 14
-    "DOR Approval", "Master Schema", "", "", "", "", "", "",
-    # POSITION 15
-    "MeF", "Schema Versions", "", "", "", "", "", "",
+    "ATS E-File EFile ATS Submission E-File Approval Print Approval E-File Compliance Print Compliance State E-File Federal E-File ATS Test Client E-File Authorization State Authority Approval DOR Approval MeF Modernized e-File E-File Diagnostics E-File Schema E-File Module Electronic Filing XML XSD XML Schema XSD Schema Schema Validation XML Tagging Schema Mapping Schema Development Schema Testing Schema Updates XMLSpy Altova XMLSpy XML Output Validation Master Schema Schema Versions Lacerte ProSeries GoSystem ONESOURCE UltraTax CCH Axcess ProSystem fx Drake ATX TaxWise TaxAct TaxSlayer ProConnect CrossLink GoSystem Tax RS Form 1040 Form 1041 Form 1120 Form 1120S Form 1065 Form 990 Schedule K-1 Individual Tax Corporate Tax Partnership Tax Software QA Manual Testing Regression Testing Functional Testing UAT Test Cases Test Scenarios Bug Tracking Defect Management Pre-Production Testing Java Delphi XE5 GitHub Jira Visual Studio LaserMap 2D Barcode GFS OSI ODT AI Tool Development MCP Claude AI LaserMap MCP TAP AI Assistant BRMS AI Automation Workflow Automation Tax Compliance Regulatory Compliance State Tax Regulations Federal Tax Regulations IRS Compliance DOR Department of Revenue Tax Form Development Filing Product Data Conversion Tax Law Changes Government Liaison"
 ]
 
 # India cities ONLY - metro + tier-2 cities
