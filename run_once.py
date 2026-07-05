@@ -209,9 +209,9 @@ def is_tax_software_testing_job(job):
     if keyword_count >= 3:
         return True
 
-    # Also accept if "us tax" or "us taxation" appears in description (backup rule)
-    # This catches legitimate US tax jobs that might have fewer than 3 specific keywords
-    if "us tax" in desc or "us taxation" in desc:
+    # Also accept if ANY of these key terms appear (backup rule for testing-specific roles)
+    # These are the core identifiers for tax software testing jobs
+    if any(term in desc for term in ["tax software testing", "e-file", "tax technology"]):
         return True
 
     return False
