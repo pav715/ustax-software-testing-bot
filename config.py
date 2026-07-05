@@ -6,7 +6,8 @@ CHAT_ID   = os.environ.get("CHAT_ID", "-1004378631673")  # US Tax Software Testi
 # Search term to fetch jobs - ACTUAL filtering happens in run_once.py
 # by checking if description has 3+ keywords from the 100-keyword list
 KEYWORDS = [
-    "tax",
+    "US tax",
+    "US taxation",
 ]
 
 # India US-Tax delivery hubs + remote. "India" already covers smaller hubs
