@@ -225,9 +225,20 @@ def is_tax_software_testing_job(job):
     has_form_in_desc = any(fn in desc for fn in form_numbers)
     has_tax_tech_keyword = any(kw in desc for kw in tax_tech_keywords)
 
-    # HYBRID: Accept if title matches OR (form AND tax-tech keyword in description)
-    # Requires BOTH form + tech keyword to avoid generic testing jobs
-    return has_matching_title or has_catchall or (has_form_in_desc and has_tax_tech_keyword)
+    # FINAL GATE: Description MUST have at least one core tax identifier
+    core_identifiers = ["us tax", "us taxation", "irs", "form 1040", "dor", "department of revenue", "tax software", "e-file"]
+    has_core_identifier = any(identifier in desc for identifier in core_identifiers)
+
+    # HYBRID + GATING:
+    # 1. Accept if title matches (already curated 50 titles)
+    # 2. OR accept if has core identifier + (form AND tax-tech keyword in description)
+    if has_matching_title or has_catchall:
+        return True
+
+    if has_core_identifier and has_form_in_desc and has_tax_tech_keyword:
+        return True
+
+    return False
 
 
 def load_state():
