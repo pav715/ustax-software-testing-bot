@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.log
+bot_state.json
+seen_jobs.json
+stats.json
+.DS_Store
