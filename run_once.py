@@ -389,7 +389,7 @@ def extract_qualification(desc, title):
 
 def main():
     log("=" * 50)
-    log("US Tax Jobs Bot — LinkedIn Only")
+    log("US Tax Software Testing Bot — LinkedIn Only")
     log("=" * 50)
 
     if not config.BOT_TOKEN:
@@ -450,11 +450,11 @@ def main():
     log(f"India/Remote: {len(india_jobs)} out of {len(jobs)} total.")
     print(f"DEBUG: India jobs: {len(india_jobs)}")
 
-    us_tax_jobs = [j for j in india_jobs if is_us_tax_job(j)]
-    log(f"US Tax relevant: {len(us_tax_jobs)} out of {len(india_jobs)} India/Remote jobs.")
-    print(f"DEBUG: US Tax jobs: {len(us_tax_jobs)}")
+    tax_software_testing_jobs = [j for j in india_jobs if is_tax_software_testing_job(j)]
+    log(f"US Tax Software Testing jobs: {len(tax_software_testing_jobs)} out of {len(india_jobs)} India/Remote jobs.")
+    print(f"DEBUG: US Tax Software Testing jobs: {len(tax_software_testing_jobs)}")
 
-    new_jobs = [j for j in us_tax_jobs if _dedup_key(j) not in seen]
+    new_jobs = [j for j in tax_software_testing_jobs if _dedup_key(j) not in seen]
     new_jobs.sort(key=lambda j: str(j.get("posted") or j.get("fetched_at") or ""))
     log(f"New jobs to send: {len(new_jobs)}")
 
