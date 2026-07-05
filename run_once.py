@@ -152,10 +152,10 @@ def is_tax_software_testing_job(job):
     """DESCRIPTION-ONLY: Accept if description has 3+ keywords from the 100-keyword list."""
     desc = job.get("description", "").lower()
 
-    # TAX SOFTWARE TESTING: 20 Filter Keywords - if ANY 1 found in description → POST
+    # TAX SOFTWARE TESTING: 20 Filter Keywords - MUST INCLUDE TAX + specific keyword
     testing_keywords = [
-        "ats", "e-file", "xml schema", "xsd", "gosystem", "lacerte", "proseries", "onesource", "ultratax", "cch axcess",
-        "mef", "tax software", "tax technology", "schema validation", "form 1040", "form 1041", "dor", "irs", "tax qa", "tax compliance",
+        "tax ats", "tax e-file", "tax xml", "tax schema", "tax gosystem", "tax lacerte", "tax proseries", "tax onesource", "tax ultratax", "tax software",
+        "tax technology", "tax mef", "tax xsd", "tax validation", "form 1040", "form 1041", "irs", "dor", "tax qa", "tax compliance",
     ]
 
     # Count keywords found in description
