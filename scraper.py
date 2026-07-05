@@ -54,10 +54,19 @@ def _fetch_job_description(job_url):
         if r.status_code != 200:
             return ""
         soup = BeautifulSoup(r.content, "html.parser")
+
+        # Try multiple possible class names for description
         desc_div = soup.find("div", class_=re.compile("show-more-less-html__markup"))
+        if not desc_div:
+            desc_div = soup.find("div", class_=re.compile("description"))
+        if not desc_div:
+            desc_div = soup.find("div", {"data-test-id": "job-details-jobs-details__main-content"})
+
         if desc_div:
             return desc_div.get_text(separator=" ", strip=True).lower()
-        return ""
+
+        # Fallback: get all text from body
+        return soup.body.get_text(separator=" ", strip=True).lower() if soup.body else ""
     except Exception:
         return ""
 
