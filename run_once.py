@@ -149,56 +149,66 @@ def is_us_tax_job(job):
 
 
 def is_tax_software_testing_job(job):
-    """Accept US Tax Software Testing jobs: form numbers OR software testing keywords."""
+    """STRICT: Accept only if title matches one of the 50 role titles (from config.KEYWORDS)."""
     title = job.get("title", "").lower()
     company = job.get("company", "").lower()
     desc = job.get("description", "").lower()
     full = f"{title} {company} {desc}"
 
+    # Reject if blocklist matches
     if BLOCKLIST.search(title):
         return False
 
-    # Tax form numbers
-    form_numbers = ["1040", "1041", "1120", "1065", "1099", "w-2"]
-
-    # Software testing keywords (QA, testing, schema, ATS, E-File, etc.)
-    testing_keywords = [
-        "qa", "qe", "quality assurance", "quality engineer",
-        "test", "tester", "testing",
-        "schema", "xml", "xsd",
-        "ats", "automated test", "e-file", "electronic filing",
-        "compliance", "validation", "regression",
-        "bug tracking", "defect", "jira", "visual studio"
-    ]
-
-    # US tax keywords
-    us_tax_keywords = [
-        "us tax", "us taxation", "tax software",
-        "lacerte", "proseries", "onesource", "atx",
-        "taxslayer", "drake", "proconnect"
-    ]
-
+    # Reject if has Indian tax keywords
     indian_tax_keywords = [
-        "gst", "goods and services tax", "income tax", "it return",
-        "indian tax", "india tax", "ato", "inr", "rupee"
+        "itr", "gst", "vat", "income tax", "tds", "tcs",
+        "indian tax", "india tax", "service tax", "excise duty",
+        "transfer pricing", "indirect tax"
     ]
-
-    has_form_number = any(fn in full for fn in form_numbers)
-    has_testing_keyword = any(kw in full for kw in testing_keywords)
-    has_us_tax_keyword = any(kw in full for kw in us_tax_keywords)
     has_indian_tax = any(kw in full for kw in indian_tax_keywords)
-
     if has_indian_tax:
         return False
 
-    # Accept if: form numbers OR (testing keywords AND US tax context)
-    if has_form_number:
-        return True
+    # STRICT MATCHING: Title MUST contain one of the 50 keywords from config
+    target_keywords = [
+        # US Tax Technology (1-10)
+        "us tax technology analyst", "tax technology analyst",
+        "us tax compliance analyst", "tax compliance technology analyst",
+        "us tax software analyst", "tax filing analyst",
+        "us tax e-file analyst", "tax form analyst",
+        "us tax regulatory analyst", "tax content analyst",
+        # E-File / Schema / ATS (11-20)
+        "e-file analyst", "e-file compliance analyst", "e-file specialist",
+        "xml schema analyst", "tax schema analyst", "ats analyst",
+        "tax schema developer", "e-file qa analyst",
+        "tax filing specialist", "electronic filing analyst",
+        # Tax QA / Testing (21-30)
+        "tax software qa analyst", "tax compliance qa analyst",
+        "tax form qa analyst", "tax software test analyst",
+        "tax regulatory qa analyst", "tax qa engineer",
+        "tax software tester", "tax qa specialist",
+        "tax form tester", "tax compliance tester",
+        # Big 4 / Consulting (31-40)
+        "tax technology consultant", "us tax technology consultant",
+        "tax technology senior", "tax technology associate",
+        "tax compliance consultant", "tax digital analyst",
+        "tax transformation analyst", "tax systems analyst",
+        "tax operations analyst", "tax process analyst",
+        # AI + Tax + Product (41-50)
+        "tax automation analyst", "tax product analyst",
+        "tax innovation analyst", "tax ai analyst",
+        "tax software product analyst", "tax technology specialist",
+        "tax implementation analyst", "tax data analyst",
+        "tax process automation analyst", "tax software implementation analyst"
+    ]
 
-    if has_testing_keyword and has_us_tax_keyword:
-        return True
+    # Check if title contains any of the 50 keywords
+    has_matching_title = any(kw in title for kw in target_keywords)
 
-    return False
+    # Also accept if has "US Tax" or "US Taxation" catchall
+    has_catchall = "us tax" in title or "us taxation" in title
+
+    return has_matching_title or has_catchall
 
 
 def load_state():
