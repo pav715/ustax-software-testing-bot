@@ -205,16 +205,8 @@ def is_tax_software_testing_job(job):
     # Count keywords found in description
     keyword_count = sum(1 for kw in testing_keywords if kw in desc)
 
-    # Accept if 3+ keywords found (means it's genuinely a tax testing/software job)
-    if keyword_count >= 3:
-        return True
-
-    # Also accept if ANY of these key terms appear (backup rule for testing-specific roles)
-    # These are the core identifiers for tax software testing jobs
-    if any(term in desc for term in ["tax software testing", "e-file", "tax technology"]):
-        return True
-
-    return False
+    # Accept if 3+ keywords found in description
+    return keyword_count >= 3
 
 
 def load_state():
