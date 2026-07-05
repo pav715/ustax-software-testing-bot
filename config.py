@@ -26,10 +26,8 @@ KEYWORDS = [
     "1099", "w-2", "schedule", "tax reporting",
 ]
 
-# India locations ONLY + Remote (work from home)
-# Remote = work from home, NOT USA states
+# India cities ONLY - metro + tier-2 cities
 LOCATIONS = [
-    "Remote",
     # Metro cities (Tier-1)
     "Bangalore",
     "Hyderabad",
