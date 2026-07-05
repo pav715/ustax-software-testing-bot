@@ -149,7 +149,7 @@ def is_us_tax_job(job):
 
 
 def is_tax_software_testing_job(job):
-    """HYBRID: Accept if title matches 50 roles OR description has tax-specific technical keywords + form numbers."""
+    """DESCRIPTION-ONLY: Accept if description has core identifier + form + tax-tech keywords."""
     title = job.get("title", "").lower()
     company = job.get("company", "").lower()
     desc = job.get("description", "").lower()
@@ -169,42 +169,21 @@ def is_tax_software_testing_job(job):
     if has_indian_tax:
         return False
 
-    # OPTION 1: Title matches one of 50 keywords
-    target_keywords = [
-        "us tax technology analyst", "tax technology analyst",
-        "us tax compliance analyst", "tax compliance technology analyst",
-        "us tax software analyst", "tax filing analyst",
-        "us tax e-file analyst", "tax form analyst",
-        "us tax regulatory analyst", "tax content analyst",
-        "e-file analyst", "e-file compliance analyst", "e-file specialist",
-        "xml schema analyst", "tax schema analyst", "ats analyst",
-        "tax schema developer", "e-file qa analyst",
-        "tax filing specialist", "electronic filing analyst",
-        "tax software qa analyst", "tax compliance qa analyst",
-        "tax form qa analyst", "tax software test analyst",
-        "tax regulatory qa analyst", "tax qa engineer",
-        "tax software tester", "tax qa specialist",
-        "tax form tester", "tax compliance tester",
-        "tax technology consultant", "us tax technology consultant",
-        "tax technology senior", "tax technology associate",
-        "tax compliance consultant", "tax digital analyst",
-        "tax transformation analyst", "tax systems analyst",
-        "tax operations analyst", "tax process analyst",
-        "tax automation analyst", "tax product analyst",
-        "tax innovation analyst", "tax ai analyst",
-        "tax software product analyst", "tax technology specialist",
-        "tax implementation analyst", "tax data analyst",
-        "tax process automation analyst", "tax software implementation analyst"
-    ]
+    # CORE IDENTIFIERS - Description MUST have one of these
+    core_identifiers = ["us tax", "us taxation", "irs", "form 1040", "dor", "department of revenue", "tax software", "e-file"]
+    has_core_identifier = any(identifier in desc for identifier in core_identifiers)
 
-    has_matching_title = any(kw in title for kw in target_keywords)
-    has_catchall = "us tax" in title or "us taxation" in title
+    if not has_core_identifier:
+        return False
 
-    # OPTION 2: Description has SPECIFIC tax-tech keywords + form numbers
-    # (NOT generic "testing" or "qa" - must be tax-specific)
+    # Form numbers MUST be in description
     form_numbers = ["1040", "1041", "1120", "1120s", "1065", "w-2", "1099"]
+    has_form_in_desc = any(fn in desc for fn in form_numbers)
 
-    # 50 US Tax Testing Keywords
+    if not has_form_in_desc:
+        return False
+
+    # 50 US Tax Testing Keywords - at least one MUST be in description
     tax_tech_keywords = [
         # E-File / Schema (1-15)
         "e-file", "efile", "ats", "xml", "xsd", "schema", "mef",
@@ -222,23 +201,10 @@ def is_tax_software_testing_job(job):
         "delphi", "2d barcode", "lasermap", "tax form development", "tax calculation"
     ]
 
-    has_form_in_desc = any(fn in desc for fn in form_numbers)
     has_tax_tech_keyword = any(kw in desc for kw in tax_tech_keywords)
 
-    # FINAL GATE: Description MUST have at least one core tax identifier
-    core_identifiers = ["us tax", "us taxation", "irs", "form 1040", "dor", "department of revenue", "tax software", "e-file"]
-    has_core_identifier = any(identifier in desc for identifier in core_identifiers)
-
-    # HYBRID + GATING:
-    # 1. Accept if title matches (already curated 50 titles)
-    # 2. OR accept if has core identifier + (form AND tax-tech keyword in description)
-    if has_matching_title or has_catchall:
-        return True
-
-    if has_core_identifier and has_form_in_desc and has_tax_tech_keyword:
-        return True
-
-    return False
+    # Accept ONLY if: core identifier + form + tax-tech keyword
+    return has_tax_tech_keyword
 
 
 def load_state():
