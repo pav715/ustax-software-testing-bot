@@ -3,36 +3,37 @@ import os
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "8714105853:AAEBU3JWHAV8mk17MjSLTYh8W2QO2I-1cts")
 CHAT_ID   = os.environ.get("CHAT_ID", "-1004378631673")  # US Tax Software Testing Jobs channel
 
-# ALL 100 exact keywords from user's list - any 1 keyword in description → POST
+# ALL 100 exact keywords for TAX SOFTWARE TESTING - any 1 keyword in description → POST
 KEYWORDS = [
-    # Tax Forms (1–20)
-    "Form 1040", "Form 1040NR", "Form 1040SR", "Form 1041", "Form 1120",
-    "Form 1120S", "Form 1065", "Form 990", "Form 1099", "W-2",
-    "Schedule A", "Schedule B", "Schedule C", "Schedule D", "Schedule E",
-    "Schedule F", "Schedule K-1", "Schedule SE", "Form 2441", "Form 8863",
-    # IRS / Regulatory (21–35)
-    "IRS", "IRS Guidelines", "IRS Regulations", "Department of Revenue", "DOR",
-    "Federal Tax", "State Tax", "Tax Compliance", "Tax Law", "Tax Code",
-    "Tax Reform", "Tax Withholding", "Tax Liability", "Tax Deductions", "Tax Credits",
-    # Preparation Keywords (36–50)
-    "Tax Preparation", "Tax Return Preparation", "Tax Filing", "Tax Review", "Tax Reviewer",
-    "Tax Return Review", "Quality Review", "Tax Advisory", "Client Returns", "Tax Planning",
-    "Tax Research", "Tax Compliance Review", "Return Review", "Tax Processing", "Tax Engagement",
-    # Software (51–65)
+    # E-File / ATS (1–20)
+    "ATS", "E-File", "EFile", "ATS Submission", "E-File Approval",
+    "Print Approval", "E-File Compliance", "Print Compliance", "State E-File", "Federal E-File",
+    "ATS Test Client", "E-File Authorization", "State Authority Approval", "DOR Approval", "MeF",
+    "Modernized e-File", "E-File Diagnostics", "E-File Schema", "E-File Module", "Electronic Filing",
+    # XML / Schema (21–35)
+    "XML", "XSD", "XML Schema", "XSD Schema", "Schema Validation",
+    "XML Tagging", "Schema Mapping", "Schema Development", "Schema Testing", "Schema Updates",
+    "XMLSpy", "Altova XMLSpy", "XML Output Validation", "Master Schema", "Schema Versions",
+    # Tax Software (36–50)
     "Lacerte", "ProSeries", "GoSystem", "ONESOURCE", "UltraTax",
     "CCH Axcess", "ProSystem fx", "Drake", "ATX", "TaxWise",
-    "TaxAct", "TaxSlayer", "ProConnect", "CrossLink", "H&R Block Software",
-    # Entity Types (66–75)
-    "Individual Tax", "Corporate Tax", "Partnership Tax", "S-Corporation", "Fiduciary Tax",
-    "Non-Resident Tax", "Exempt Organization", "Trust Tax", "Estate Tax", "Self-Employed Tax",
-    # Income Types (76–85)
-    "W-2 Income", "1099 Income", "Rental Income", "Business Income", "Capital Gains",
-    "Dividend Income", "Interest Income", "Self-Employment Income", "Foreign Income", "Passive Income",
-    # Combination Keywords (86–100)
-    "1040 Preparation", "1040 Review", "1041 Preparation", "1065 Review", "1120 Preparation",
-    "W-2 Processing", "1099 Processing", "IRS Compliance Review", "Federal State Tax Preparation",
-    "Individual Corporate Tax", "Tax Return QA", "Tax Software Review", "Multi-State Tax Filing",
-    "Tax Deadline Compliance", "Client Tax Advisory",
+    "TaxAct", "TaxSlayer", "ProConnect", "CrossLink", "GoSystem Tax RS",
+    # Tax Forms (51–60)
+    "Form 1040", "Form 1041", "Form 1120", "Form 1120S", "Form 1065",
+    "Form 990", "Schedule K-1", "Individual Tax", "Corporate Tax", "Partnership Tax",
+    # QA / Testing (61–70)
+    "Software QA", "Manual Testing", "Regression Testing", "Functional Testing", "UAT",
+    "Test Cases", "Test Scenarios", "Bug Tracking", "Defect Management", "Pre-Production Testing",
+    # Tools / Tech (71–80)
+    "Java", "Delphi XE5", "GitHub", "Jira", "Visual Studio",
+    "LaserMap", "2D Barcode", "GFS", "OSI", "ODT",
+    # AI / Automation (81–88)
+    "AI Tool Development", "MCP", "Claude AI", "LaserMap MCP", "TAP AI Assistant",
+    "BRMS", "AI Automation", "Workflow Automation",
+    # Compliance / Regulatory (89–100)
+    "Tax Compliance", "Regulatory Compliance", "State Tax Regulations", "Federal Tax Regulations", "IRS Compliance",
+    "DOR", "Department of Revenue", "Tax Form Development", "Filing Product", "Data Conversion",
+    "Tax Law Changes", "Government Liaison",
 ]
 
 # India cities ONLY - metro + tier-2 cities
