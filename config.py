@@ -10,26 +10,26 @@ KEYWORDS = [
     "US taxation",
 ]
 
-# India US-Tax delivery hubs + remote. "India" already covers smaller hubs
-# (Kochi, Coimbatore, Ahmedabad, Noida, etc.) via LinkedIn's country search,
-# and INDIA_LOCATION in run_once.py keeps those cities in the results.
+# India metro cities + tier-2 cities. Ordered by priority (metros first)
 LOCATIONS = [
+    # Metro cities (Tier-1) - priority search
     "Remote",
-    "Hyderabad",
     "Bangalore",
-    "Chennai",
+    "Hyderabad",
     "Mumbai",
+    "Delhi",
     "Pune",
+    "Chennai",
+    "Kolkata",
+    # State capitals & major cities (Tier-2)
     "Gurgaon",
     "Noida",
-    "Delhi",
-    "Kolkata",
     "Ahmedabad",
-    "Jaipur",
-    "Indore",
     "Chandigarh",
+    "Jaipur",
     "Kochi",
     "Coimbatore",
+    "Indore",
     "Lucknow",
 ]
 
