@@ -169,42 +169,44 @@ def is_tax_software_testing_job(job):
     if has_indian_tax:
         return False
 
-    # CORE IDENTIFIERS - Description MUST have one of these
-    core_identifiers = ["us tax", "us taxation", "irs", "form 1040", "dor", "department of revenue", "tax software", "e-file"]
-    has_core_identifier = any(identifier in desc for identifier in core_identifiers)
-
-    if not has_core_identifier:
-        return False
-
-    # Form numbers MUST be in description
-    form_numbers = ["1040", "1041", "1120", "1120s", "1065", "w-2", "1099"]
-    has_form_in_desc = any(fn in desc for fn in form_numbers)
-
-    if not has_form_in_desc:
-        return False
-
-    # 50 US Tax Testing Keywords - at least one MUST be in description
-    tax_tech_keywords = [
-        # E-File / Schema (1-15)
-        "e-file", "efile", "ats", "xml", "xsd", "schema", "mef",
-        "modernized e-file", "electronic filing", "e-file approval", "state e-file",
-        "federal e-file", "schema validation", "xml tagging", "schema mapping",
-        # Regulatory Keywords (16-25)
-        "dor", "department of revenue", "state authority", "irs approval", "ats submission",
-        "state approval", "e-file authorization", "form approval", "print approval", "regulatory compliance",
-        # QA / Testing (26-40)
-        "software testing", "quality assurance", "qa", "manual testing", "functional testing",
-        "regression testing", "uat", "test cases", "test scenarios", "bug tracking",
-        "defect management", "pre-production testing", "post-production testing", "compliance testing", "software validation",
-        # Tech / Tools (41-50)
-        "jira", "visual studio", "xmlspy", "github", "java",
-        "delphi", "2d barcode", "lasermap", "tax form development", "tax calculation"
+    # 100 US Tax Software Testing Keywords
+    testing_keywords = [
+        # E-File / ATS (1-20)
+        "ats", "e-file", "efile", "ats submission", "e-file approval",
+        "print approval", "e-file compliance", "print compliance", "state e-file", "federal e-file",
+        "ats test client", "e-file authorization", "state authority approval", "dor approval", "mef",
+        "modernized e-file", "e-file diagnostics", "e-file schema", "e-file module", "electronic filing",
+        # XML / Schema (21-35)
+        "xml", "xsd", "xml schema", "xsd schema", "schema validation",
+        "xml tagging", "schema mapping", "schema development", "schema testing", "schema updates",
+        "xmlspy", "altova xmlspy", "xml output validation", "master schema", "schema versions",
+        # Tax Software (36-50)
+        "lacerte", "proseries", "gosystem", "onesource", "ultratax",
+        "cch axcess", "prosystem fx", "drake", "atx", "taxwise",
+        "taxact", "taxslayer", "proconnect", "crosslink", "gosystem tax rs",
+        # Tax Forms (51-60)
+        "form 1040", "form 1041", "form 1120", "form 1120s", "form 1065",
+        "form 990", "schedule k-1", "individual tax", "corporate tax", "partnership tax",
+        # QA / Testing (61-70)
+        "software qa", "manual testing", "regression testing", "functional testing", "uat",
+        "test cases", "test scenarios", "bug tracking", "defect management", "pre-production testing",
+        # Tools / Tech (71-80)
+        "java", "delphi xe5", "github", "jira", "visual studio",
+        "lasermap", "2d barcode", "gfs", "osi", "odt",
+        # AI / Automation (81-88)
+        "ai tool development", "mcp", "claude ai", "lasermap mcp", "tap ai assistant",
+        "brms", "ai automation", "workflow automation",
+        # Compliance / Regulatory (89-100)
+        "tax compliance", "regulatory compliance", "state tax regulations", "federal tax regulations", "irs compliance",
+        "dor", "department of revenue", "tax form development", "filing product", "data conversion",
+        "tax law changes", "government liaison"
     ]
 
-    has_tax_tech_keyword = any(kw in desc for kw in tax_tech_keywords)
+    # Count keywords found in description
+    keyword_count = sum(1 for kw in testing_keywords if kw in desc)
 
-    # Accept ONLY if: core identifier + form + tax-tech keyword
-    return has_tax_tech_keyword
+    # Accept if 3+ keywords found (means it's genuinely a tax testing/software job)
+    return keyword_count >= 3
 
 
 def load_state():
