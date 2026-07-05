@@ -152,6 +152,16 @@ def is_tax_software_testing_job(job):
     """Accept if: 2+ keywords found AND location is India (not remote non-India)."""
     desc = job.get("description", "").lower()
     location = job.get("location", "").lower()
+    title = job.get("title", "").lower()
+
+    # Reject fresher/degree/B.Tech jobs (no experience required)
+    fresher_keywords = [
+        "fresher", "b.tech", "b tech", "degree", "graduate fresher",
+        "entry level", "0 experience", "exp 0", "no experience required",
+        "b.e degree", "btech fresher", "degree fresher"
+    ]
+    if any(kw in desc or kw in title for kw in fresher_keywords):
+        return False
 
     # Reject non-India remote jobs (US, Europe, etc.)
     non_india_keywords = ["usa", "united states", "us ", "uk ", "europe", "canada", "australia", "singapore", "sverige", "japan", "dubai"]
