@@ -149,7 +149,7 @@ def is_us_tax_job(job):
 
 
 def is_tax_software_testing_job(job):
-    """STRICT: Accept only if title matches one of the 50 role titles (from config.KEYWORDS)."""
+    """HYBRID: Accept if title matches 50 roles OR description has tax-specific technical keywords + form numbers."""
     title = job.get("title", "").lower()
     company = job.get("company", "").lower()
     desc = job.get("description", "").lower()
@@ -169,32 +169,27 @@ def is_tax_software_testing_job(job):
     if has_indian_tax:
         return False
 
-    # STRICT MATCHING: Title MUST contain one of the 50 keywords from config
+    # OPTION 1: Title matches one of 50 keywords
     target_keywords = [
-        # US Tax Technology (1-10)
         "us tax technology analyst", "tax technology analyst",
         "us tax compliance analyst", "tax compliance technology analyst",
         "us tax software analyst", "tax filing analyst",
         "us tax e-file analyst", "tax form analyst",
         "us tax regulatory analyst", "tax content analyst",
-        # E-File / Schema / ATS (11-20)
         "e-file analyst", "e-file compliance analyst", "e-file specialist",
         "xml schema analyst", "tax schema analyst", "ats analyst",
         "tax schema developer", "e-file qa analyst",
         "tax filing specialist", "electronic filing analyst",
-        # Tax QA / Testing (21-30)
         "tax software qa analyst", "tax compliance qa analyst",
         "tax form qa analyst", "tax software test analyst",
         "tax regulatory qa analyst", "tax qa engineer",
         "tax software tester", "tax qa specialist",
         "tax form tester", "tax compliance tester",
-        # Big 4 / Consulting (31-40)
         "tax technology consultant", "us tax technology consultant",
         "tax technology senior", "tax technology associate",
         "tax compliance consultant", "tax digital analyst",
         "tax transformation analyst", "tax systems analyst",
         "tax operations analyst", "tax process analyst",
-        # AI + Tax + Product (41-50)
         "tax automation analyst", "tax product analyst",
         "tax innovation analyst", "tax ai analyst",
         "tax software product analyst", "tax technology specialist",
@@ -202,13 +197,37 @@ def is_tax_software_testing_job(job):
         "tax process automation analyst", "tax software implementation analyst"
     ]
 
-    # Check if title contains any of the 50 keywords
     has_matching_title = any(kw in title for kw in target_keywords)
-
-    # Also accept if has "US Tax" or "US Taxation" catchall
     has_catchall = "us tax" in title or "us taxation" in title
 
-    return has_matching_title or has_catchall
+    # OPTION 2: Description has SPECIFIC tax-tech keywords + form numbers
+    # (NOT generic "testing" or "qa" - must be tax-specific)
+    form_numbers = ["1040", "1041", "1120", "1120s", "1065", "w-2", "1099"]
+
+    # 50 US Tax Testing Keywords
+    tax_tech_keywords = [
+        # E-File / Schema (1-15)
+        "e-file", "efile", "ats", "xml", "xsd", "schema", "mef",
+        "modernized e-file", "electronic filing", "e-file approval", "state e-file",
+        "federal e-file", "schema validation", "xml tagging", "schema mapping",
+        # Regulatory Keywords (16-25)
+        "dor", "department of revenue", "state authority", "irs approval", "ats submission",
+        "state approval", "e-file authorization", "form approval", "print approval", "regulatory compliance",
+        # QA / Testing (26-40)
+        "software testing", "quality assurance", "qa", "manual testing", "functional testing",
+        "regression testing", "uat", "test cases", "test scenarios", "bug tracking",
+        "defect management", "pre-production testing", "post-production testing", "compliance testing", "software validation",
+        # Tech / Tools (41-50)
+        "jira", "visual studio", "xmlspy", "github", "java",
+        "delphi", "2d barcode", "lasermap", "tax form development", "tax calculation"
+    ]
+
+    has_form_in_desc = any(fn in desc for fn in form_numbers)
+    has_tax_tech_keyword = any(kw in desc for kw in tax_tech_keywords)
+
+    # HYBRID: Accept if title matches OR (form AND tax-tech keyword in description)
+    # Requires BOTH form + tech keyword to avoid generic testing jobs
+    return has_matching_title or has_catchall or (has_form_in_desc and has_tax_tech_keyword)
 
 
 def load_state():
