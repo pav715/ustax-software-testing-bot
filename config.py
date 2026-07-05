@@ -3,32 +3,35 @@ import os
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "8714105853:AAEBU3JWHAV8mk17MjSLTYh8W2QO2I-1cts")
 CHAT_ID   = os.environ.get("CHAT_ID", "-1004378631673")  # US Tax Software Testing Jobs channel
 
-# ONE mega search query with all 100 keywords (LinkedIn searches for ANY match)
-# Much faster: 1 search per location instead of 100 searches
+# PHASE 1: Positions 1-10 from each section (100% of 8 sections)
+# Posts job if ANY keyword found in description
 KEYWORDS = [
-    "ATS E-File EFile ATS Submission E-File Approval Print Approval E-File Compliance Print Compliance State E-File Federal E-File ATS Test Client E-File Authorization State Authority Approval DOR Approval MeF Modernized e-File E-File Diagnostics E-File Schema E-File Module Electronic Filing XML XSD XML Schema XSD Schema Schema Validation XML Tagging Schema Mapping Schema Development Schema Testing Schema Updates XMLSpy Altova XMLSpy XML Output Validation Master Schema Schema Versions Lacerte ProSeries GoSystem ONESOURCE UltraTax CCH Axcess ProSystem fx Drake ATX TaxWise TaxAct TaxSlayer ProConnect CrossLink GoSystem Tax RS Form 1040 Form 1041 Form 1120 Form 1120S Form 1065 Form 990 Schedule K-1 Individual Tax Corporate Tax Partnership Tax Software QA Manual Testing Regression Testing Functional Testing UAT Test Cases Test Scenarios Bug Tracking Defect Management Pre-Production Testing Java Delphi XE5 GitHub Jira Visual Studio LaserMap 2D Barcode GFS OSI ODT AI Tool Development MCP Claude AI LaserMap MCP TAP AI Assistant BRMS AI Automation Workflow Automation Tax Compliance Regulatory Compliance State Tax Regulations Federal Tax Regulations IRS Compliance DOR Department of Revenue Tax Form Development Filing Product Data Conversion Tax Law Changes Government Liaison"
+    # Position 1 from each section
+    "ATS", "XML", "Lacerte", "Form 1040", "Software QA", "Java", "AI Tool Development", "Tax Compliance",
+    # Position 2
+    "E-File", "XSD", "ProSeries", "Form 1041", "Manual Testing", "Delphi XE5", "MCP", "Regulatory Compliance",
+    # Position 3
+    "EFile", "XML Schema", "GoSystem", "Form 1120", "Regression Testing", "GitHub", "Claude AI", "State Tax Regulations",
+    # Position 4
+    "ATS Submission", "XSD Schema", "ONESOURCE", "Form 1120S", "Functional Testing", "Jira", "LaserMap MCP", "Federal Tax Regulations",
+    # Position 5
+    "E-File Approval", "Schema Validation", "UltraTax", "Form 1065", "UAT", "Visual Studio", "TAP AI Assistant", "IRS Compliance",
+    # Position 6
+    "Print Approval", "XML Tagging", "CCH Axcess", "Form 990", "Test Cases", "LaserMap", "BRMS", "DOR",
+    # Position 7
+    "E-File Compliance", "Schema Mapping", "ProSystem fx", "Schedule K-1", "Test Scenarios", "2D Barcode", "AI Automation", "Department of Revenue",
+    # Position 8
+    "Print Compliance", "Schema Development", "Drake", "Individual Tax", "Bug Tracking", "GFS", "Workflow Automation", "Tax Form Development",
+    # Position 9
+    "State E-File", "Schema Testing", "ATX", "Corporate Tax", "Defect Management", "OSI", "", "Filing Product",
+    # Position 10
+    "Federal E-File", "Schema Updates", "TaxWise", "Partnership Tax", "Pre-Production Testing", "ODT", "", "Data Conversion",
 ]
 
 # India cities ONLY - metro + tier-2 cities
 LOCATIONS = [
-    # Metro cities (Tier-1)
-    "Bangalore",
-    "Hyderabad",
-    "Mumbai",
-    "Delhi",
-    "Pune",
-    "Chennai",
-    "Kolkata",
-    # State capitals & major cities (Tier-2)
-    "Gurgaon",
-    "Noida",
-    "Ahmedabad",
-    "Chandigarh",
-    "Jaipur",
-    "Kochi",
-    "Coimbatore",
-    "Indore",
-    "Lucknow",
+    "Bangalore", "Hyderabad", "Mumbai", "Delhi", "Pune", "Chennai", "Kolkata",
+    "Gurgaon", "Noida", "Ahmedabad", "Chandigarh", "Jaipur", "Kochi", "Coimbatore", "Indore", "Lucknow",
 ]
 
 MAX_JOBS_PER_CYCLE = 15
