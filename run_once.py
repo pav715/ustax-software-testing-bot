@@ -152,37 +152,26 @@ def is_tax_software_testing_job(job):
     """DESCRIPTION-ONLY: Accept if description has 3+ keywords from the 100-keyword list."""
     desc = job.get("description", "").lower()
 
-    # 100 US Tax Software Testing Keywords
+    # 100 TAX SOFTWARE TESTING Filter Keywords - if ANY 1 found in description → POST
     testing_keywords = [
-        # E-File / ATS (1-20)
-        "ats", "e-file", "efile", "ats submission", "e-file approval",
-        "print approval", "e-file compliance", "print compliance", "state e-file", "federal e-file",
-        "ats test client", "e-file authorization", "state authority approval", "dor approval", "mef",
-        "modernized e-file", "e-file diagnostics", "e-file schema", "e-file module", "electronic filing",
-        # XML / Schema (21-35)
-        "xml", "xsd", "xml schema", "xsd schema", "schema validation",
-        "xml tagging", "schema mapping", "schema development", "schema testing", "schema updates",
-        "xmlspy", "altova xmlspy", "xml output validation", "master schema", "schema versions",
-        # Tax Software (36-50)
-        "lacerte", "proseries", "gosystem", "onesource", "ultratax",
-        "cch axcess", "prosystem fx", "drake", "atx", "taxwise",
-        "taxact", "taxslayer", "proconnect", "crosslink", "gosystem tax rs",
-        # Tax Forms (51-60)
-        "form 1040", "form 1041", "form 1120", "form 1120s", "form 1065",
-        "form 990", "schedule k-1", "individual tax", "corporate tax", "partnership tax",
-        # QA / Testing (61-70)
-        "software qa", "manual testing", "regression testing", "functional testing", "uat",
-        "test cases", "test scenarios", "bug tracking", "defect management", "pre-production testing",
-        # Tools / Tech (71-80)
-        "java", "delphi xe5", "github", "jira", "visual studio",
-        "lasermap", "2d barcode", "gfs", "osi", "odt",
-        # AI / Automation (81-88)
-        "ai tool development", "mcp", "claude ai", "lasermap mcp", "tap ai assistant",
-        "brms", "ai automation", "workflow automation",
-        # Compliance / Regulatory (89-100)
-        "tax compliance", "regulatory compliance", "state tax regulations", "federal tax regulations", "irs compliance",
-        "dor", "department of revenue", "tax form development", "filing product", "data conversion",
-        "tax law changes", "government liaison"
+        # Tax Forms (1-20)
+        "form 1040", "form 1041", "form 1120", "form 1120s", "form 1065", "form 990", "schedule k-1", "individual tax", "corporate tax", "partnership tax",
+        "e-file", "ats", "1040nr", "1040sr", "schedule a", "schedule b", "schedule c", "schedule d", "schedule e", "schedule f",
+        # IRS / Regulatory (21-30)
+        "irs", "dor", "department of revenue", "federal tax", "state tax", "tax law", "tax code", "irs regulations", "irs guidelines", "irs compliance",
+        # QA / Testing (31-45)
+        "software qa", "manual testing", "regression testing", "functional testing", "uat", "test cases", "test scenarios", "bug tracking", "defect management", "pre-production testing",
+        "quality assurance", "qa testing", "test automation", "testing", "qa",
+        # Tools / Tech (46-60)
+        "java", "github", "jira", "visual studio", "lasermap", "xml", "xsd", "schema", "delphi", "sql",
+        "database", "api testing", "automation", "devops", "ci/cd",
+        # Software (61-75)
+        "lacerte", "proseries", "gosystem", "onesource", "ultratax", "cch axcess", "prosystem fx", "drake", "atx", "taxwise", "taxact", "taxslayer", "proconnect", "crosslink", "h&r block",
+        # AI / Automation (76-85)
+        "ai tool development", "mcp", "claude ai", "automation", "workflow automation", "brms", "ai automation", "machine learning", "python", "scripting",
+        # Compliance (86-100)
+        "tax compliance", "regulatory compliance", "state tax regulations", "federal tax regulations", "irs compliance", "filing product", "data conversion", "tax documentation", "compliance testing", "regulatory testing",
+        "e-file compliance", "ats submission", "filing", "submission", "approval", "validation",
     ]
 
     # Count keywords found in description
