@@ -10,10 +10,11 @@ KEYWORDS = [
     "US taxation",
 ]
 
-# India metro cities + tier-2 cities. Ordered by priority (metros first)
+# India locations ONLY + Remote (work from home)
+# Remote = work from home, NOT USA states
 LOCATIONS = [
-    # Metro cities (Tier-1) - priority search
     "Remote",
+    # Metro cities (Tier-1)
     "Bangalore",
     "Hyderabad",
     "Mumbai",
