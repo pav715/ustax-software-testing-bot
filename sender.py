@@ -187,9 +187,11 @@ def format_job(job):
         "",
         f"💼 *Role:* {safe_title}",
         f"📍 *Location:* {safe_loc}",
-        f"🎓 *Qualification:* {safe_qual}",
-        f"👨‍💻 *Experience:* {safe_exp}",
     ]
+
+    if safe_exp and safe_exp.lower() not in ("not mentioned", ""):
+        lines.append(f"👨‍💻 *Experience:* {safe_exp}")
+
 
     # Posted time — exact date/time in IST where available
     posted_str = _format_posted(posted, job.get("fetched_at", ""))

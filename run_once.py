@@ -149,10 +149,16 @@ def is_us_tax_job(job):
 
 
 def is_tax_software_testing_job(job):
-    """DESCRIPTION-ONLY: Accept if description has 3+ keywords from the 100-keyword list."""
+    """Accept if: 2+ keywords found AND location is India (not remote non-India)."""
     desc = job.get("description", "").lower()
+    location = job.get("location", "").lower()
 
-    # TAX SOFTWARE TESTING: 20 Filter Keywords - MUST INCLUDE TAX + specific keyword
+    # Reject non-India remote jobs (US, Europe, etc.)
+    non_india_keywords = ["usa", "united states", "us ", "uk ", "europe", "canada", "australia", "singapore", "sverige", "japan", "dubai"]
+    if "remote" in location and any(kw in location for kw in non_india_keywords):
+        return False
+
+    # TAX SOFTWARE TESTING: 20 Filter Keywords - REQUIRE MINIMUM 2
     testing_keywords = [
         "tax ats", "tax e-file", "tax xml", "tax schema", "tax gosystem", "tax lacerte", "tax proseries", "tax onesource", "tax ultratax", "tax software",
         "tax technology", "tax mef", "tax xsd", "tax validation", "form 1040", "form 1041", "irs", "dor", "tax qa", "tax compliance",

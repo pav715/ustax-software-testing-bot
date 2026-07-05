@@ -50,23 +50,18 @@ def _make_job(title, company, location, url, posted=""):
 def _fetch_job_description(job_url):
     """Fetch full job description from LinkedIn job URL."""
     try:
-        r = SESSION.get(job_url, timeout=8)
+        r = SESSION.get(job_url, timeout=3)
         if r.status_code != 200:
             return ""
         soup = BeautifulSoup(r.content, "html.parser")
 
-        # Try multiple possible class names for description
+        # Try specific class first (fastest)
         desc_div = soup.find("div", class_=re.compile("show-more-less-html__markup"))
-        if not desc_div:
-            desc_div = soup.find("div", class_=re.compile("description"))
-        if not desc_div:
-            desc_div = soup.find("div", {"data-test-id": "job-details-jobs-details__main-content"})
-
         if desc_div:
             return desc_div.get_text(separator=" ", strip=True).lower()
 
-        # Fallback: get all text from body
-        return soup.body.get_text(separator=" ", strip=True).lower() if soup.body else ""
+        # If not found, return empty (don't spend time on fallback)
+        return ""
     except Exception:
         return ""
 
