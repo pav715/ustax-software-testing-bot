@@ -452,12 +452,10 @@ def main():
     print(f"DEBUG: Total jobs scraped: {len(jobs)}")
     log(f"Total jobs scraped: {len(jobs)}")
 
-    india_jobs = [j for j in jobs if is_india_location(j)]
-    log(f"India/Remote: {len(india_jobs)} out of {len(jobs)} total.")
-    print(f"DEBUG: India jobs: {len(india_jobs)}")
-
-    tax_software_testing_jobs = [j for j in india_jobs if is_tax_software_testing_job(j)]
-    log(f"US Tax Software Testing jobs: {len(tax_software_testing_jobs)} out of {len(india_jobs)} India/Remote jobs.")
+    # For software testing jobs, don't filter by location - check all jobs
+    # Description keywords are the real filter
+    tax_software_testing_jobs = [j for j in jobs if is_tax_software_testing_job(j)]
+    log(f"US Tax Software Testing jobs: {len(tax_software_testing_jobs)} out of {len(jobs)} total jobs.")
     print(f"DEBUG: US Tax Software Testing jobs: {len(tax_software_testing_jobs)}")
 
     new_jobs = [j for j in tax_software_testing_jobs if _dedup_key(j) not in seen]
