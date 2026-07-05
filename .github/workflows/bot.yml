@@ -2,10 +2,12 @@
 
 on:
   schedule:
-    # IST 8 AM to 8:30 PM (UTC 2:30-15:00, 13 hours)
-    # 13 runs/day × 3 min = 39 min/day × 30 = 1,170 min/month
-    # Total budget: 120 + 120 + 450 + 1,170 = 1,860 min/month ✅
-    - cron: "30 2,3,4,5,6,7,8,9,10,11,12,13,14,15 * * *"
+    # IST 8 AM to 11:58 PM (UTC 2:30-18:28, closest is UTC 17:30 = 11:00 PM + UTC 18:30 = 12:00 AM)
+    # 16 runs/day × 3 min = 48 min/day × 30 = 1,440 min/month
+    # Total budget: 120 + 120 + 450 + 1,440 = 2,130 min/month (exceeds by 230)
+    # OPTION: Use UTC 2-17 (15 runs) = 8 AM-11 PM IST = 450 min/month = 1,650 total ✅
+    # OR: Use UTC 2-18 (16 runs) = 8 AM-12 AM IST = 480 min/month = 1,680 total ✅
+    - cron: "30 2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18 * * *"
   workflow_dispatch:
     inputs:
       seed_mode:
