@@ -152,6 +152,12 @@ def is_tax_software_testing_job(job):
     """Accept if: 2+ keywords found AND location is India (not remote non-India)."""
     desc = job.get("description", "").lower()
     location = job.get("location", "").lower()
+    title = job.get("title", "").lower()
+    company = job.get("company", "").lower()
+
+    # REJECT Indian tax roles (CA, GST, etc.)
+    if BLOCKLIST.search(title) or BLOCKLIST.search(company) or BLOCKLIST.search(desc):
+        return False
 
     # Reject non-India remote jobs (US, Europe, etc.)
     non_india_keywords = ["usa", "united states", "us ", "uk ", "europe", "canada", "australia", "singapore", "sverige", "japan", "dubai"]
@@ -170,9 +176,9 @@ def is_tax_software_testing_job(job):
 
     # Debug output for accepted jobs
     if keyword_count >= 2:
-        title = job.get("title", "")
-        company = job.get("company", "")
-        print(f"DEBUG: '{title}' @ {company} matched {keyword_count} keywords: {matched_keywords}")
+        title_disp = job.get("title", "")
+        company_disp = job.get("company", "")
+        print(f"DEBUG: '{title_disp}' @ {company_disp} matched {keyword_count} keywords: {matched_keywords}")
 
     # Accept only if 2+ keywords found (prevents false positives)
     return keyword_count >= 2
