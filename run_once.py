@@ -152,26 +152,24 @@ def is_tax_software_testing_job(job):
     """DESCRIPTION-ONLY: Accept if description has 3+ keywords from the 100-keyword list."""
     desc = job.get("description", "").lower()
 
-    # 100 TAX SOFTWARE TESTING Filter Keywords - if ANY 1 found in description → POST
+    # 100 EXACT FILTER KEYWORDS - if ANY 1 found in description → POST
     testing_keywords = [
-        # Tax Forms (1-20)
-        "form 1040", "form 1041", "form 1120", "form 1120s", "form 1065", "form 990", "schedule k-1", "individual tax", "corporate tax", "partnership tax",
-        "e-file", "ats", "1040nr", "1040sr", "schedule a", "schedule b", "schedule c", "schedule d", "schedule e", "schedule f",
-        # IRS / Regulatory (21-30)
-        "irs", "dor", "department of revenue", "federal tax", "state tax", "tax law", "tax code", "irs regulations", "irs guidelines", "irs compliance",
-        # QA / Testing (31-45)
-        "software qa", "manual testing", "regression testing", "functional testing", "uat", "test cases", "test scenarios", "bug tracking", "defect management", "pre-production testing",
-        "quality assurance", "qa testing", "test automation", "testing", "qa",
-        # Tools / Tech (46-60)
-        "java", "github", "jira", "visual studio", "lasermap", "xml", "xsd", "schema", "delphi", "sql",
-        "database", "api testing", "automation", "devops", "ci/cd",
-        # Software (61-75)
-        "lacerte", "proseries", "gosystem", "onesource", "ultratax", "cch axcess", "prosystem fx", "drake", "atx", "taxwise", "taxact", "taxslayer", "proconnect", "crosslink", "h&r block",
-        # AI / Automation (76-85)
-        "ai tool development", "mcp", "claude ai", "automation", "workflow automation", "brms", "ai automation", "machine learning", "python", "scripting",
-        # Compliance (86-100)
-        "tax compliance", "regulatory compliance", "state tax regulations", "federal tax regulations", "irs compliance", "filing product", "data conversion", "tax documentation", "compliance testing", "regulatory testing",
-        "e-file compliance", "ats submission", "filing", "submission", "approval", "validation",
+        # Tax Technology / Software (1-10) - PRIORITY
+        "tax technology", "tax software", "tax platform", "tax engine", "tax system", "tax application", "tax tool", "tax automation", "tax digital", "tax transformation",
+        # E-File / ATS / Schema (11-25) - PRIORITY
+        "ats", "e-file", "efile", "xml schema", "xsd", "schema validation", "mef", "modernized e-file", "e-file approval", "ats submission", "print approval", "e-file compliance", "dor approval", "state e-file", "e-file diagnostics",
+        # Tax Software Names (26-45)
+        "lacerte", "proseries", "gosystem", "onesource", "ultratax", "cch axcess", "prosystem fx", "drake", "atx", "taxwise", "taxact", "taxslayer", "proconnect", "crosslink", "vertex", "avalara", "sovos", "corptax", "bloomberg tax", "ryan tax",
+        # QA / Testing (46-60)
+        "tax qa", "tax software qa", "tax software testing", "tax compliance qa", "regression testing", "functional testing", "uat", "test cases", "bug tracking", "manual testing", "software validation", "pre-production testing", "post-production testing", "defect management", "compliance testing",
+        # Tax Preparation (61-75)
+        "tax preparation", "tax return", "tax filing", "tax review", "form 1040", "form 1041", "form 1120", "form 1065", "w-2", "1099", "schedule k-1", "irs", "dor", "federal tax", "state tax",
+        # Tools / Tech (76-85)
+        "java", "xml", "xsd", "github", "jira", "visual studio", "lasermap", "2d barcode", "delphi", "xmlspy",
+        # AI / Automation (86-95)
+        "ai tool development", "mcp", "brms", "ai automation", "tax ai", "tax automation", "workflow automation", "claude ai", "tax innovation", "rpa tax",
+        # Compliance / Regulatory (96-100)
+        "tax compliance", "regulatory compliance", "tax form development", "filing product", "government liaison",
     ]
 
     # Count keywords found in description
