@@ -47,6 +47,21 @@ def _make_job(title, company, location, url, posted=""):
     }
 
 
+def _fetch_job_description(job_url):
+    """Fetch full job description from LinkedIn job URL."""
+    try:
+        r = SESSION.get(job_url, timeout=8)
+        if r.status_code != 200:
+            return ""
+        soup = BeautifulSoup(r.content, "html.parser")
+        desc_div = soup.find("div", class_=re.compile("show-more-less-html__markup"))
+        if desc_div:
+            return desc_div.get_text(separator=" ", strip=True).lower()
+        return ""
+    except Exception:
+        return ""
+
+
 def scrape_linkedin(keyword, location, since_seconds=86400):
     """Scrape LinkedIn guest API for jobs matching keyword + location."""
     jobs = []
@@ -77,7 +92,10 @@ def scrape_linkedin(keyword, location, since_seconds=86400):
                 posted  = t_tag.get("datetime", "") if t_tag else ""
 
                 if title and link:
-                    jobs.append(_make_job(title, company, loc_str, link, posted))
+                    job = _make_job(title, company, loc_str, link, posted)
+                    job["description"] = _fetch_job_description(link)
+                    jobs.append(job)
+                    _delay()
             except Exception:
                 pass
     except Exception as e:
