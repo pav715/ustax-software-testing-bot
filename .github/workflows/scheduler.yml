@@ -1,0 +1,50 @@
+name: Bot Scheduler
+
+on:
+  schedule:
+    # IST 8:00 AM - 11:00 PM (UTC 2:30-17:30)
+    - cron: "30 2 * * *"
+    - cron: "30 3 * * *"
+    - cron: "30 4 * * *"
+    - cron: "30 5 * * *"
+    - cron: "30 6 * * *"
+    - cron: "30 7 * * *"
+    - cron: "30 8 * * *"
+    - cron: "30 9 * * *"
+    - cron: "30 10 * * *"
+    - cron: "30 11 * * *"
+    - cron: "30 12 * * *"
+    - cron: "30 13 * * *"
+    - cron: "30 14 * * *"
+    - cron: "30 15 * * *"
+    - cron: "30 16 * * *"
+    - cron: "30 17 * * *"
+    - cron: "0 18 * * *"   # 11:30 PM IST
+  workflow_dispatch:
+
+concurrency:
+  group: scheduler-${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  trigger-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger Software Testing Bot
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          if [ -z "$GH_PAT" ]; then
+            echo "ERROR: GH_PAT secret missing — add repo PAT with workflow scope"
+            exit 1
+          fi
+          echo "Triggering bot at $(date -u) UTC"
+          http_code=$(curl -s -o /tmp/resp.txt -w "%{http_code}" -X POST \
+            -H "Authorization: Bearer ${GH_PAT}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/bot.yml/dispatches" \
+            -d '{"ref":"main"}')
+          echo "HTTP $http_code"
+          cat /tmp/resp.txt
+          [ "$http_code" = "204" ] || exit 1
