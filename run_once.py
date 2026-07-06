@@ -18,170 +18,126 @@ SEEN_FILE  = "seen_jobs.json"
 STATS_FILE = "stats.json"
 STATE_FILE = "bot_state.json"
 
-US_TAX_TERMS = re.compile(
-    r"("
-    r"1040|1041|1065|1120|"
-    r"us\s*tax\s*preparer|us\s*tax\s*analyst|"
-    r"enrolled\s*agent|"
-    r"cpa\s*tax|"
-    r"irs"
-    r")",
-    re.IGNORECASE,
-)
-
 BLOCKLIST = re.compile(
     r"\b("
     r"recruiter|recruitment|talent\s*acquisition|bench\s*sales|"
     r"us\s*it\s*recruiter|it\s*recruiter|"
     r"software\s*engineer(?!\s*tax)|software\s*developer(?!\s*tax)|"
-    r"selenium|automation\s*tester|manual\s*tester|"
     r"payroll(?!\s*tax)|accounts\s*payable|accounts\s*receivable|"
     r"statutory\s*audit|business\s*development|sales\s*executive|"
-    # Indian tax roles - GST (1-10)
     r"\bgst\b|goods\s*and\s*services\s*tax|gstn|gst\s*compliance|gst\s*specialist|gst\s*manager|gst\s*consultant|gst\s*filing|gst\s*returns|gst\s*audit|gst\s*advisory|"
-    # Income Tax India (11-20)
     r"income\s*tax\s*(?!withholding)|income\s*tax\s*consultant|income\s*tax\s*executive|"
     r"direct\s*tax(?!\s*analyst\s*(?:us|federal|state))|india\s*tax|domestic\s*tax|indian\s*tax|"
-    # TDS / TCS (21-25)
     r"\btds\b|\btcs\b|tax\s*deducted|tax\s*collected|tds\s*analyst|tds\s*filing|"
-    # Indirect Tax India (26-35)
     r"indirect\s*tax(?!\s*analyst\s*(?:us|federal))|"
     r"\bvat\b(?!\s*us)|service\s*tax|excise\s*duty|customs\s*duty|"
     r"transfer\s*pricing|tax\s*litigation|"
-    # CA / Finance Related (36-45)
     r"chartered\s*accountant|ca\s*article|ca\s*analyst|"
     r"(?<!us\s)(?<!federal\s)finance\s*analyst(?!\s*us)|accounts\s*analyst|^accountant$|"
     r"financial\s*analyst(?!\s*(?:us|tax))|finance\s*executive|accounts\s*executive|"
-    # Other Indian Tax (46-50)
     r"tax\s*auditor|statutory\s*compliance|tax\s*compliance\s*executive(?!\s*us)"
     r")\b",
     re.IGNORECASE,
 )
 
-
-US_STATES = re.compile(
-    r"\b(New York|California|Texas|Florida|Illinois|Washington DC|"
-    r"Massachusetts|New Jersey|Georgia|Ohio|Virginia|Pennsylvania|"
-    r"North Carolina|Michigan|Arizona|Colorado|"
-    r"NY|CA|TX|FL|IL|NJ|GA|MA|OH|VA|PA|NC|MI|AZ|CO|DC|"
-    r"Remote|WFH|Work from Home)\b",
+INDIAN_TAX_BLOCKLIST = re.compile(
+    r"\b("
+    r"gst\s*analyst|gst\s*compliance|gst\s*executive|gst\s*specialist|gst\s*manager|"
+    r"gst\s*consultant|gst\s*filing|gst\s*returns|gst\s*audit|gst\s*advisory|"
+    r"income\s*tax\s*analyst|income\s*tax\s*consultant|income\s*tax\s*executive|"
+    r"direct\s*tax\s*analyst|direct\s*tax\s*consultant|direct\s*tax\s*manager|"
+    r"india\s*tax\s*analyst|india\s*tax\s*consultant|domestic\s*tax|"
+    r"tds\s*analyst|tds\s*compliance|tcs\s*analyst|tds\s*executive|tds\s*filing|"
+    r"indirect\s*tax\s*analyst|indirect\s*tax\s*consultant|indirect\s*tax\s*manager|"
+    r"vat\s*analyst|service\s*tax|excise\s*duty|customs\s*duty|"
+    r"tax\s*litigation|indirect\s*tax\s*specialist|"
+    r"tax\s*auditor|tax\s*litigation\s*specialist|transfer\s*pricing|"
+    r"tax\s*compliance\s*executive|statutory\s*compliance|"
+    r"itr|itr-1|itr-2|itr-3|itr-4|itr-5|itr-6|itr-7|"
+    r"form\s*16|form\s*16a|form\s*24q|"
+    r"pan\s*number|aadhar|aadhaar|cin|gstin|"
+    r"goods\s*and\s*services\s*tax|section\s*80|fy20[0-9]{2}|ay20[0-9]{2}|"
+    r"tds|tcs|advance\s*tax|challan|saral|"
+    r"indian\s*tax|india\s*tax|ato"
+    r")\b",
     re.IGNORECASE,
 )
 
+TESTING_KEYWORDS = [
+    "tax ats", "tax e-file", "tax xml", "tax schema", "tax gosystem", "tax lacerte",
+    "tax proseries", "tax onesource", "tax ultratax", "tax software", "tax technology",
+    "tax mef", "tax xsd", "tax validation", "form 1040", "form 1041", "irs", "dor", "tax qa",
+]
 
-def is_valid_us_tax_job(job):
-    """Accept only if job mentions US state or Remote explicitly."""
-    title = job.get("title", "")
-    location = job.get("location", "")
-    company = job.get("company", "")
-    full = f"{title} {location} {company}"
-    return bool(US_STATES.search(full))
+SOFTWARE_KEYWORDS = {
+    "tax ats", "tax e-file", "tax xml", "tax schema", "tax gosystem", "tax lacerte",
+    "tax proseries", "tax onesource", "tax ultratax", "tax software", "tax technology",
+    "tax mef", "tax xsd", "tax validation", "tax qa",
+}
+
+INDIA_LOCATION_KEYWORDS = [
+    "india", "hyderabad", "bangalore", "bengaluru", "chennai", "mumbai", "pune", "delhi",
+    "gurgaon", "gurugram", "noida", "kolkata", "ahmedabad", "jaipur", "indore", "chandigarh",
+    "kochi", "coimbatore", "lucknow", "visakhapatnam", "vizag",
+]
+
+FOREIGN_LOCATION_KEYWORDS = [
+    "usa", "united states", "u.s.", "canada", "uk", "united kingdom", "australia", "europe",
+    "egypt", "middle east", "africa", "singapore", "malaysia", "sweden", "sverige", "japan",
+    "dubai", "germany", "france",
+]
+
+
+def _keyword_hits(text, keywords):
+    hits = []
+    for kw in keywords:
+        if len(kw) <= 4:
+            if re.search(rf"\b{re.escape(kw)}\b", text):
+                hits.append(kw)
+        elif kw in text:
+            hits.append(kw)
+    return hits
 
 
 def is_india_location(job):
-    """Return True only if job is India/Remote — reject other countries."""
-    loc = job.get("location", "").lower()
+    loc = (job.get("location") or "").lower()
+    title = (job.get("title") or "").lower()
 
-    india_keywords = [
-        "india", "remote", "hyderabad", "bangalore", "bengaluru", "chennai",
-        "mumbai", "pune", "delhi", "gurgaon", "noida", "kolkata", "ahmedabad",
-        "jaipur", "indore", "chandigarh", "kochi", "coimbatore", "lucknow"
-    ]
-
-    reject_keywords = [
-        "usa", "united states", "canada", "uk", "australia", "europe", "egypt",
-        "middle east", "africa", "singapore", "malaysia"
-    ]
-
-    if any(kw in loc for kw in reject_keywords):
+    if any(kw in loc for kw in FOREIGN_LOCATION_KEYWORDS):
         return False
 
-    if any(kw in loc for kw in india_keywords) or not loc or loc.strip() == "":
+    if any(kw in loc for kw in INDIA_LOCATION_KEYWORDS):
         return True
 
-    return False
-
-
-def is_us_tax_job(job):
-    title = job.get("title", "").lower()
-    company = job.get("company", "").lower()
-    desc = job.get("description", "").lower()
-    full = f"{title} {company} {desc}"
-
-    if BLOCKLIST.search(title):
-        return False
-
-    form_numbers = ["1040", "1041", "1120", "1065", "1099", "w-2"]
-    us_specific_keywords = [
-        "enrolled agent", "ea", "cpa", "irs", "internal revenue",
-        "us tax", "us taxation", "united states tax"
-    ]
-
-    common_tax_roles = [
-        "tax preparer", "tax analyst", "tax accountant", "tax associate",
-        "tax manager", "tax director", "tax consultant", "tax specialist",
-        "tax compliance", "tax auditor"
-    ]
-
-    indian_tax_keywords = [
-        "gst", "goods and services tax", "income tax", "it return",
-        "indian tax", "india tax", "ato", "inr", "rupee"
-    ]
-
-    has_form_number = any(fn in full for fn in form_numbers)
-    has_form_in_desc = any(fn in desc for fn in form_numbers)
-    has_us_keyword = any(kw in full for kw in us_specific_keywords)
-    has_common_role = any(role in title for role in common_tax_roles)
-    has_indian_tax = any(kw in full for kw in indian_tax_keywords)
-
-    if has_indian_tax:
-        return False
-
-    # Accept if has form numbers OR US-specific keywords in full text
-    if has_form_number or has_us_keyword:
-        return True
-
-    # Accept if common tax role title AND form numbers MUST be in description
-    if has_common_role and has_form_in_desc:
-        return True
+    if "remote" in loc:
+        context = f"{loc} {title}"
+        return "india" in context or any(kw in context for kw in INDIA_LOCATION_KEYWORDS)
 
     return False
 
 
 def is_tax_software_testing_job(job):
-    """Accept if: 2+ keywords found AND location is India (not remote non-India)."""
-    desc = job.get("description", "").lower()
-    location = job.get("location", "").lower()
-    title = job.get("title", "").lower()
-    company = job.get("company", "").lower()
+    """Accept if 2+ testing keywords + at least one software/QA keyword in full text."""
+    desc = (job.get("description") or "").lower()
+    title = (job.get("title") or "").lower()
+    company = (job.get("company") or "").lower()
+    blob = f"{title} {company} {desc}"
 
-    # REJECT Indian tax roles (CA, GST, etc.)
-    if BLOCKLIST.search(title) or BLOCKLIST.search(company) or BLOCKLIST.search(desc):
+    if BLOCKLIST.search(blob):
+        return False
+    if INDIAN_TAX_BLOCKLIST.search(blob):
         return False
 
-    # Reject non-India remote jobs (US, Europe, etc.)
-    non_india_keywords = ["usa", "united states", "us ", "uk ", "europe", "canada", "australia", "singapore", "sverige", "japan", "dubai"]
-    if "remote" in location and any(kw in location for kw in non_india_keywords):
-        return False
+    matched = _keyword_hits(blob, TESTING_KEYWORDS)
+    has_software = any(kw in blob for kw in SOFTWARE_KEYWORDS)
+    if len(matched) >= 2 and has_software:
+        print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: {matched}")
+    return len(matched) >= 2 and has_software
 
-    # TAX SOFTWARE TESTING: 20 Filter Keywords - REQUIRE MINIMUM 2
-    testing_keywords = [
-        "tax ats", "tax e-file", "tax xml", "tax schema", "tax gosystem", "tax lacerte", "tax proseries", "tax onesource", "tax ultratax", "tax software",
-        "tax technology", "tax mef", "tax xsd", "tax validation", "form 1040", "form 1041", "irs", "dor", "tax qa", "tax compliance",
-    ]
 
-    # Count keywords found in description
-    matched_keywords = [kw for kw in testing_keywords if kw in desc]
-    keyword_count = len(matched_keywords)
-
-    # Debug output for accepted jobs
-    if keyword_count >= 2:
-        title_disp = job.get("title", "")
-        company_disp = job.get("company", "")
-        print(f"DEBUG: '{title_disp}' @ {company_disp} matched {keyword_count} keywords: {matched_keywords}")
-
-    # Accept only if 2+ keywords found (prevents false positives)
-    return keyword_count >= 2
+def _mark_run_complete(state):
+    state["last_run_at"] = datetime.utcnow().isoformat()
+    save_state(state)
 
 
 def load_state():
@@ -270,19 +226,19 @@ def handle_commands(state, stats):
             msg = (update.get("message") or update.get("channel_post") or {})
             text = msg.get("text", "").strip().lower()
             chat_id = str(msg.get("chat", {}).get("id", ""))
-            if not chat_id:
+            if not chat_id or chat_id != str(config.CHAT_ID):
                 continue
 
             api = f"https://api.telegram.org/bot{config.BOT_TOKEN}/sendMessage"
 
             if text.startswith("/status"):
                 reply = (
-                    f"🤖 *US Tax Jobs Bot — Status*\n\n"
+                    f"🤖 *US Tax Software Testing Bot — Status*\n\n"
                     f"{'⏸ PAUSED' if state.get('paused') else '✅ RUNNING'}\n\n"
                     f"📊 *Today ({stats['date']}):*\n"
                     f"• Jobs sent: *{stats['sent']}*\n"
                     f"• Companies: *{len(stats['companies'])}*\n"
-                    f"⏱ Checks every *1 hour*\n"
+                    f"⏱ Checks every *{config.CHECK_INTERVAL_LABEL}*\n"
                     f"🕐 {datetime.now().strftime('%d %b %Y %H:%M IST')}"
                 )
                 requests.post(api, json={"chat_id": chat_id, "text": reply, "parse_mode": "Markdown"}, timeout=10)
@@ -305,6 +261,7 @@ def enrich_job(job):
     if job.get("description") and len(job["description"]) > 300:
         return job
     url = job.get("url", "")
+    fetched = False
     try:
         if "linkedin.com" in url:
             match = re.search(r'/(\d{8,})', url)
@@ -320,6 +277,7 @@ def enrich_job(job):
                     )
                     if desc_div:
                         job["description"] = desc_div.get_text(" ", strip=True)[:2000]
+                        fetched = True
                     criteria = soup.find_all("span", class_=re.compile(r"description__job-criteria-text"))
                     for c in criteria:
                         text = c.get_text(strip=True)
@@ -328,7 +286,8 @@ def enrich_job(job):
                                 job["experience"] = text
     except Exception as e:
         log(f"  [Enrich] error: {e}")
-    time.sleep(1.5)
+    if fetched:
+        time.sleep(1.0)
     return job
 
 
@@ -344,10 +303,10 @@ def extract_experience(desc, title):
             return m.group(1).strip()[:100]
     t = title.lower()
     if any(x in t for x in ["senior", "manager", "lead"]):
-        return "5+ Years (US Tax)"
+        return "5+ Years (Tax Software QA)"
     elif any(x in t for x in ["associate", "junior", "jr"]):
-        return "1-2 Years (US Tax)"
-    return "2-5 Years (US Tax)"
+        return "1-2 Years (Tax Software QA)"
+    return "2-5 Years (Tax Software QA)"
 
 
 def extract_qualification(desc, title):
@@ -365,14 +324,9 @@ def main():
     log("US Tax Software Testing Bot — LinkedIn Only")
     log("=" * 50)
 
-    if not config.BOT_TOKEN:
-        log("ERROR: BOT_TOKEN not set.")
-        print("ERROR: BOT_TOKEN not set in config!")
-        return
-    if not config.CHAT_ID:
-        log("ERROR: CHAT_ID not set.")
-        print("ERROR: CHAT_ID not set in config!")
-        return
+    if not config.BOT_TOKEN or not config.CHAT_ID:
+        log("ERROR: BOT_TOKEN or CHAT_ID not set in environment.")
+        sys.exit(1)
 
     log(f"BOT_TOKEN present: {len(config.BOT_TOKEN)} chars")
     log(f"CHAT_ID: {config.CHAT_ID}")
@@ -402,9 +356,6 @@ def main():
     # Cap: minimum 30 min, maximum 2 hours
     since_seconds = max(1800, min(since_seconds, 7200))
 
-    state["last_run_at"] = datetime.utcnow().isoformat()
-    save_state(state)
-
     log(f"Fetch window: {since_seconds // 60} minutes")
 
     seen = load_seen()
@@ -413,26 +364,46 @@ def main():
     try:
         jobs = fetch_all_jobs(since_seconds=since_seconds)
     except Exception as e:
-        log(f"Scrape error (will continue with empty list): {e}")
-        jobs = []
+        log(f"Scrape error: {e}")
+        send_fail_alert(str(e))
+        sys.exit(1)
 
-    print(f"DEBUG: Total jobs scraped: {len(jobs)}")
+    if os.environ.get("SEED_MODE", "").lower() == "true":
+        for job in jobs:
+            seen.add(_dedup_key(job))
+        save_seen(seen)
+        _mark_run_complete(state)
+        log(f"Seed mode: marked {len(jobs)} jobs as seen, sent 0.")
+        return
+
     log(f"Total jobs scraped: {len(jobs)}")
 
-    # For software testing jobs, don't filter by location - check all jobs
-    # Description keywords are the real filter
-    tax_software_testing_jobs = [j for j in jobs if is_tax_software_testing_job(j)]
-    log(f"US Tax Software Testing jobs: {len(tax_software_testing_jobs)} out of {len(jobs)} total jobs.")
-    print(f"DEBUG: US Tax Software Testing jobs: {len(tax_software_testing_jobs)}")
+    india_jobs = [j for j in jobs if is_india_location(j)]
+    log(f"India jobs: {len(india_jobs)} out of {len(jobs)} total.")
+
+    tax_software_testing_jobs = []
+    for job in india_jobs:
+        title = (job.get("title") or "").lower()
+        company = (job.get("company") or "").lower()
+        if BLOCKLIST.search(title) or BLOCKLIST.search(company):
+            continue
+        if INDIAN_TAX_BLOCKLIST.search(title) or INDIAN_TAX_BLOCKLIST.search(company):
+            continue
+        job = enrich_job(job)
+        if is_tax_software_testing_job(job):
+            tax_software_testing_jobs.append(job)
+
+    log(f"Tax Software Testing relevant: {len(tax_software_testing_jobs)} out of {len(india_jobs)} India jobs.")
 
     new_jobs = [j for j in tax_software_testing_jobs if _dedup_key(j) not in seen]
     new_jobs.sort(key=lambda j: str(j.get("posted") or j.get("fetched_at") or ""))
     log(f"New jobs to send: {len(new_jobs)}")
 
     if not new_jobs:
-        log("No new US Tax jobs this cycle.")
+        log("No new Tax Software Testing jobs this cycle.")
         save_seen(seen)
         save_stats(stats)
+        _mark_run_complete(state)
         return
 
     if len(new_jobs) > config.MAX_JOBS_PER_CYCLE:
@@ -441,7 +412,6 @@ def main():
 
     sent = 0
     for job in new_jobs:
-        job = enrich_job(job)
         desc  = job.get("description", "")
         title = job.get("title", "")
         if not job.get("_experience"):
@@ -465,6 +435,7 @@ def main():
 
     save_seen(seen)
     save_stats(stats)
+    _mark_run_complete(state)
     log(f"Done. Sent {sent} new jobs. Today total: {stats['sent']}. Tracked: {len(seen)}")
 
 

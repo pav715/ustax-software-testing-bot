@@ -227,7 +227,7 @@ def send_daily_summary(stats):
     companies = stats.get("companies", {})
 
     lines = [
-        "📊 *US Tax Jobs — Daily Summary*",
+        "📊 *US Tax Software Testing — Daily Summary*",
         f"📅 {today}",
         "",
         f"✅ *Jobs sent today:* {sent}",
@@ -242,7 +242,7 @@ def send_daily_summary(stats):
 
     lines += [
         "",
-        "⏱ Bot checks every *5 minutes*",
+        f"⏱ Bot checks every *{config.CHECK_INTERVAL_LABEL}*",
         f"🕐 {datetime.now().strftime('%d %b %Y %H:%M IST')}",
     ]
 
@@ -256,8 +256,8 @@ def send_and_pin_welcome():
     Requires the bot to have 'Pin Messages' admin permission.
     """
     msg = (
-        "👋 *Welcome to US Tax Jobs India\\!*\n\n"
-        "🎯 This channel posts *fresh US Tax job openings* every 5 minutes — "
+        "👋 *Welcome to US Tax Software Testing India\\!*\n\n"
+        "🎯 This channel posts *fresh Tax Software Testing & QA roles* hourly — "
         "automatically sourced from LinkedIn, Big 4 firms and top IT/BPO companies\\.\n\n"
         "💼 *Roles we cover:*\n"
         "• US Tax Preparer / Reviewer\n"
@@ -321,7 +321,7 @@ def send_and_pin_welcome():
 def send_fail_alert(error_msg=""):
     """Send alert if bot encounters a critical error."""
     msg = (
-        "❌ *US Tax Jobs Bot — Error*\n\n"
+        "❌ *US Tax Software Testing Bot — Error*\n\n"
         f"Something went wrong:\n`{_escape(str(error_msg)[:200])}`\n\n"
         "Please check GitHub Actions logs.\n"
         f"🕐 {datetime.now().strftime('%d %b %Y %H:%M')}"

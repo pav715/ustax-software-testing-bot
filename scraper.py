@@ -1,4 +1,4 @@
-"""LinkedIn job scraper — guest API, no login needed. Updated: 2026-07-04"""
+"""LinkedIn job scraper — guest API, no login needed."""
 import requests
 import hashlib
 import re
@@ -28,7 +28,7 @@ def _job_id(url, title, company):
 
 
 def _delay():
-    time.sleep(random.uniform(1.5, 3.0))
+    time.sleep(random.uniform(0.8, 1.5))
 
 
 def _make_job(title, company, location, url, posted=""):
@@ -47,27 +47,8 @@ def _make_job(title, company, location, url, posted=""):
     }
 
 
-def _fetch_job_description(job_url):
-    """Fetch full job description from LinkedIn job URL."""
-    try:
-        r = SESSION.get(job_url, timeout=3)
-        if r.status_code != 200:
-            return ""
-        soup = BeautifulSoup(r.content, "html.parser")
-
-        # Try specific class first (fastest)
-        desc_div = soup.find("div", class_=re.compile("show-more-less-html__markup"))
-        if desc_div:
-            return desc_div.get_text(separator=" ", strip=True).lower()
-
-        # If not found, return empty (don't spend time on fallback)
-        return ""
-    except Exception:
-        return ""
-
-
 def scrape_linkedin(keyword, location, since_seconds=86400):
-    """Scrape LinkedIn guest API for jobs matching keyword + location."""
+    """Scrape LinkedIn guest API — list cards only; descriptions enriched later."""
     jobs = []
     try:
         url = (
@@ -75,8 +56,13 @@ def scrape_linkedin(keyword, location, since_seconds=86400):
             f"keywords={quote(keyword)}&location={quote(location)}"
             f"&f_TPR=r{since_seconds}&sortBy=DD&start=0"
         )
-        r = SESSION.get(url, timeout=8)
-        if r.status_code != 200:
+        for attempt in range(3):
+            r = SESSION.get(url, timeout=8)
+            if r.status_code == 200:
+                break
+            if r.status_code in (429, 503) and attempt < 2:
+                time.sleep(5 * (attempt + 1))
+                continue
             print(f"  [LinkedIn] HTTP {r.status_code} — '{keyword}' / {location}")
             return jobs
 
@@ -96,10 +82,7 @@ def scrape_linkedin(keyword, location, since_seconds=86400):
                 posted  = t_tag.get("datetime", "") if t_tag else ""
 
                 if title and link:
-                    job = _make_job(title, company, loc_str, link, posted)
-                    job["description"] = _fetch_job_description(link)
-                    jobs.append(job)
-                    _delay()
+                    jobs.append(_make_job(title, company, loc_str, link, posted))
             except Exception:
                 pass
     except Exception as e:
