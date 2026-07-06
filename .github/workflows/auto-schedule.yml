@@ -1,0 +1,16 @@
+name: US Tax Software Testing Bot (Auto)
+
+# AUTO ONLY — no concurrency, no manual conflict
+# IST 8:00 AM - 11:30 PM (UTC 2:30-17:30 + 18:00)
+on:
+  schedule:
+    - cron: "30 2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17 * * *"
+    - cron: "0 18 * * *"
+  workflow_dispatch:
+
+jobs:
+  run:
+    uses: ./.github/workflows/bot-run.yml
+    secrets: inherit
+    with:
+      seed_mode: "false"
