@@ -2,18 +2,9 @@
 
 on:
   schedule:
-    # IST 8:00 AM to 11:30 PM (UTC 2:30-18:00 at :00 minutes = 2,3,4...17 UTC hours)
-    # 16 runs/day: 8 AM, 9 AM, 10 AM, 11 AM, 12 PM, 1 PM, 2 PM, 3 PM, 4 PM, 5 PM, 6 PM, 7 PM, 8 PM, 9 PM, 10 PM, 11 PM
-    # Wait, need to recalculate UTC for :00 minutes
-    # IST 8:00 AM = UTC 2:30 (so cron :00 would be UTC 2:00 = 7:30 AM IST - too early)
-    # For :00 minutes: IST 8:00 AM = UTC 2:30, so we need UTC 3,4,5...18 at :00
-    # UTC 3:00 = IST 8:30 AM (not 8:00)
-    # Better: Use UTC 2:00 = IST 7:30 AM (close), last UTC 17:00 = IST 10:30 PM (not 11:30 PM)
-    # Actually: IST doesn't align with :00 minute cron. Closest:
-    # UTC 2:00 onwards = IST 7:30 AM onwards (starts 30 min early)
-    # UTC 2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18 at :00 = 17 runs
-    # Covers IST 7:30 AM to 12:00 AM (includes 8 AM to 11:30 PM)
-    - cron: "0 2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18 * * *"
+    # IST 8:00 AM - 11:30 PM exactly (UTC :30 = IST :00 each hour; 18:00 UTC = 11:30 PM IST)
+    - cron: "30 2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17 * * *"
+    - cron: "0 18 * * *"
   workflow_dispatch:
     inputs:
       seed_mode:
@@ -24,6 +15,7 @@ on:
 concurrency:
   group: bot-run
   cancel-in-progress: false
+  queue: max
 
 jobs:
   run-bot:
