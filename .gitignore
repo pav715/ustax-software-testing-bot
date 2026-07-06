@@ -1,7 +1,5 @@
 __pycache__/
 *.pyc
+.env
+.venv/
 *.log
-bot_state.json
-seen_jobs.json
-stats.json
-.DS_Store
