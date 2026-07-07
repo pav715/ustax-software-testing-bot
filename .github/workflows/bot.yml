@@ -1,4 +1,4 @@
-﻿name: US Tax Software Testing Bot (Manual)
+name: US Tax Software Testing Bot (Manual)
 
 on:
   workflow_dispatch:
