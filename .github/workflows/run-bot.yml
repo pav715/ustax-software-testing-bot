@@ -1,12 +1,18 @@
-name: US Tax Software Testing Bot (Auto)
+name: US Tax Software Testing Bot Core
 
 on:
-  schedule:
-    - cron: "0,30 2-17 * * *"
-    - cron: "0 18 * * *"
+  workflow_call:
+    inputs:
+      skip_dedupe:
+        description: Skip dedupe guard
+        type: boolean
+        default: false
   workflow_dispatch:
-  repository_dispatch:
-    types: [run-bot]
+    inputs:
+      skip_dedupe:
+        description: Skip dedupe guard
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -22,53 +28,36 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Gate — active hours & dedupe
+      - name: Dedupe guard
         id: gate
         run: |
-          if [ "${{ github.event_name }}" != "schedule" ]; then
-            echo "Manual/external trigger — always run"
+          SKIP="${{ inputs.skip_dedupe }}"
+          if [ "$SKIP" = "true" ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-
-          IST_H=$(TZ=Asia/Kolkata date +%-H)
-          IST_M=$(TZ=Asia/Kolkata date +%-M)
-          echo "IST time: ${IST_H}:${IST_M}"
-
-          if [ "$IST_H" -lt 8 ]; then
-            echo "Before 8AM IST — skip"
-            echo "run=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          if [ "$IST_H" -gt 23 ] || { [ "$IST_H" -eq 23 ] && [ "$IST_M" -gt 30 ]; }; then
-            echo "After 11:30PM IST — skip"
-            echo "run=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
           if [ -f bot_state.json ]; then
             SHOULD=$(python3 - <<'PY'
-          import json, sys
+          import json
           from datetime import datetime
           try:
               state = json.load(open("bot_state.json"))
               last = state.get("last_run_at", "")
               if not last:
                   print("true")
-                  sys.exit(0)
-              secs = (datetime.utcnow() - datetime.fromisoformat(last)).total_seconds()
-              print("false" if secs < 2400 else "true")
+              else:
+                  secs = (datetime.utcnow() - datetime.fromisoformat(last)).total_seconds()
+                  print("false" if secs < 2700 else "true")
           except Exception:
               print("true")
           PY
           )
             if [ "$SHOULD" = "false" ]; then
-              echo "Already ran within 40 min — skip duplicate"
+              echo "Ran within 45 min — skip"
               echo "run=false" >> "$GITHUB_OUTPUT"
               exit 0
             fi
           fi
-
           echo "run=true" >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-python@v5

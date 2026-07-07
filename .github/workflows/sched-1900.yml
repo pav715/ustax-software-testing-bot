@@ -1,0 +1,11 @@
+name: Auto 7:00 PM IST
+
+on:
+  schedule:
+    - cron: "30 13 * * *"
+  workflow_dispatch:
+
+jobs:
+  call-bot:
+    uses: ./.github/workflows/run-bot.yml
+    secrets: inherit
