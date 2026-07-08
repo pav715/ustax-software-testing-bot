@@ -64,16 +64,36 @@ INDIAN_TAX_BLOCKLIST = re.compile(
 )
 
 TESTING_KEYWORDS = [
-    "tax ats", "tax e-file", "tax xml", "tax schema", "tax gosystem", "tax lacerte",
-    "tax proseries", "tax onesource", "tax ultratax", "tax software", "tax technology",
-    "tax mef", "tax xsd", "tax validation", "form 1040", "form 1041", "irs", "dor", "tax qa",
+    "tax software", "tax technology", "tax tech", "tax qa", "tax testing", "tax tester",
+    "tax automation", "tax application", "tax ats", "tax e-file", "tax xml", "tax schema",
+    "tax gosystem", "tax lacerte", "tax proseries", "tax onesource", "tax ultratax",
+    "tax mef", "tax xsd", "tax validation", "software testing", "qa engineer",
+    "quality assurance", "test engineer", "automation engineer",
+    "form 1040", "form 1041", "irs", "dor", "efile", "e-file", "xml schema",
+    "lacerte", "proseries", "ultratax", "onesource", "gosystem", "drake",
+    "selenium", "cypress", "playwright", "api testing", "regression testing",
 ]
 
 SOFTWARE_KEYWORDS = {
-    "tax ats", "tax e-file", "tax xml", "tax schema", "tax gosystem", "tax lacerte",
-    "tax proseries", "tax onesource", "tax ultratax", "tax software", "tax technology",
-    "tax mef", "tax xsd", "tax validation", "tax qa",
+    "tax software", "tax technology", "tax tech", "tax qa", "tax testing",
+    "tax ats", "tax e-file", "tax xml", "tax schema", "tax gosystem",
+    "tax lacerte", "tax proseries", "tax onesource", "tax ultratax",
+    "tax mef", "tax xsd", "tax validation", "lacerte", "proseries",
+    "ultratax", "onesource", "gosystem", "efile", "e-file",
 }
+
+# Title match — Tax Software / QA / Testing roles
+TESTING_ROLE_TITLE = re.compile(
+    r"\b("
+    r"tax\s*(?:software|technology|tech|qa|quality|testing|tester|automation|application)|"
+    r"(?:software|technology|tech|application)\s*(?:testing|tester|qa).{0,25}tax|"
+    r"tax.{0,25}(?:software|technology|qa|testing|tester|automation)|"
+    r"e[\s-]*file|efile|xml\s*schema|tax\s*ats|tax\s*validation|"
+    r"lacerte|proseries|ultratax|onesource|gosystem|mef\s*testing|"
+    r"qa\s*(?:engineer|analyst|lead).{0,20}tax|tax\s*qa\s*(?:engineer|analyst|lead)"
+    r")\b",
+    re.IGNORECASE,
+)
 
 INDIA_LOCATION_KEYWORDS = [
     "india", "hyderabad", "bangalore", "bengaluru", "chennai", "mumbai", "pune", "delhi",
@@ -117,7 +137,7 @@ def is_india_location(job):
 
 
 def is_tax_software_testing_job(job):
-    """Accept if 2+ testing keywords + at least one software/QA keyword in full text."""
+    """Accept tax software/QA titled roles, or 1+ testing keywords in full text."""
     desc = (job.get("description") or "").lower()
     title = (job.get("title") or "").lower()
     company = (job.get("company") or "").lower()
@@ -128,11 +148,15 @@ def is_tax_software_testing_job(job):
     if INDIAN_TAX_BLOCKLIST.search(blob):
         return False
 
+    if TESTING_ROLE_TITLE.search(title):
+        print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: testing role title")
+        return True
+
     matched = _keyword_hits(blob, TESTING_KEYWORDS)
-    has_software = any(kw in blob for kw in SOFTWARE_KEYWORDS)
-    if len(matched) >= 2 and has_software:
+    if len(matched) >= 1:
         print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: {matched}")
-    return len(matched) >= 2 and has_software
+        return True
+    return False
 
 
 def _mark_run_complete(state):
