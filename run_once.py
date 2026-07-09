@@ -111,21 +111,15 @@ TESTING_KEYWORDS = [
     "lead qa e-file analyst", "senior tax qa engineer", "tax qa consultant", "tax test manager",
 ]
 
-TAX_SOFTWARE_PRODUCTS = re.compile(
+# Required signal — at least ONE must be present (not product names alone)
+REQUIRED_TAX_SIGNAL = re.compile(
     r"\b("
-    r"lacerte|proseries|ultratax|onesource|one\s*source|"
-    r"go[\s-]*system|gosystem|drake|atx|taxslayer|taxact|taxwise|"
-    r"proconnect|prosystem|crosslink|cch\s*axcess|h\s*&\s*r\s*block|intuit|thomson\s*reuters|"
-    r"tax\s*software|tax\s*platform|tax\s*application|filing\s*software|tax\s*engine"
-    r")\b",
-    re.IGNORECASE,
-)
-
-TAX_TESTING_CONTEXT = re.compile(
-    r"\b("
-    r"tax|e[\s-]*file|efile|ats|schema|xml|xsd|mef|regulatory|compliance|"
-    r"filing\s*product|form\s*104|form\s*112|form\s*106|form\s*990|"
-    r"lacerte|proseries|ultratax|onesource|gosystem|drake|filing\s*software"
+    r"tax\s*software|"
+    r"\bats\b|automated\s*test\s*system|"
+    r"e[\s-]*file|efile|"
+    r"\bxml\b|xml\s*schema|xsd|"
+    r"1040|form\s*1040|"
+    r"\bdor\b|department\s*of\s*revenue"
     r")\b",
     re.IGNORECASE,
 )
@@ -251,12 +245,13 @@ def _passes_early_filter(title, company, role_title_pattern):
     return True
 
 
-def _has_tax_testing_context(text):
-    return bool(TAX_TESTING_CONTEXT.search(text))
+def _has_required_tax_signal(text):
+    """Must have tax software, ATS, e-file, XML, 1040, or DOR."""
+    return bool(REQUIRED_TAX_SIGNAL.search(text))
 
 
 def is_tax_software_testing_job(job):
-    """Top 50 tax software testing titles + 100 keywords — tax context required."""
+    """Accept only when tax software / ATS / e-file / XML / 1040 / DOR signal present."""
     desc = (job.get("description") or "").lower()
     title = (job.get("title") or "").lower()
     company = (job.get("company") or "").lower()
@@ -265,13 +260,15 @@ def is_tax_software_testing_job(job):
     if INDIAN_TAX_BLOCKLIST.search(title) or INDIAN_TAX_BLOCKLIST.search(company):
         return False
 
-    if GENERIC_IT_BLOCKLIST.search(blob) and not _has_tax_testing_context(blob):
+    if GENERIC_IT_BLOCKLIST.search(blob) and not _has_required_tax_signal(blob):
         return False
 
     if TESTING_ROLE_TITLE.search(title):
         if BLOCKLIST.search(title) or BLOCKLIST.search(company):
             return False
-        if GENERIC_QA_TITLE.search(title) and not _has_tax_testing_context(f"{title} {company}"):
+        if GENERIC_QA_TITLE.search(title) and not _has_required_tax_signal(blob):
+            return False
+        if not _has_required_tax_signal(blob):
             return False
         print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: tax software testing title")
         return True
@@ -280,25 +277,16 @@ def is_tax_software_testing_job(job):
         return False
     if INDIAN_TAX_BLOCKLIST.search(blob):
         return False
-    if GENERIC_QA_TITLE.search(title) and not _has_tax_testing_context(blob):
+    if GENERIC_QA_TITLE.search(title) and not _has_required_tax_signal(blob):
         return False
-    if GENERIC_IT_BLOCKLIST.search(blob) and not _has_tax_testing_context(blob):
+    if GENERIC_IT_BLOCKLIST.search(blob) and not _has_required_tax_signal(blob):
+        return False
+
+    if not _has_required_tax_signal(blob):
         return False
 
     matched = _keyword_hits(blob, TESTING_KEYWORDS)
-    if not matched:
-        return False
-
-    if not _has_tax_testing_context(blob):
-        return False
-
-    has_product = TAX_SOFTWARE_PRODUCTS.search(blob)
-    has_testing_signal = TESTING_SIGNAL.search(blob)
-    has_core_kw = any(
-        "tax" in kw or "e-file" in kw or "efile" in kw or "ats" in kw or "schema" in kw or "mef" in kw
-        for kw in matched
-    )
-    if has_core_kw or (has_product and has_testing_signal):
+    if matched and TESTING_SIGNAL.search(blob):
         print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: {matched}")
         return True
     return False
