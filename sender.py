@@ -7,8 +7,10 @@ import re
 import time
 from datetime import datetime, date, timedelta
 import config
+from telegram_templates import render_job_post
 
 API = f"https://api.telegram.org/bot{config.BOT_TOKEN}"
+BRAND = "testing"
 
 
 def _escape(text):
@@ -152,6 +154,15 @@ def _experience_display(job, title):
     return "See job description ↓"
 
 
+def _posted_today(posted):
+    if not posted:
+        return False
+    try:
+        return (date.today() - date.fromisoformat(str(posted)[:10])).days == 0
+    except Exception:
+        return False
+
+
 def format_job(job):
     title   = job.get("title", "")
     company = job.get("company", "")
@@ -163,55 +174,24 @@ def format_job(job):
     qual   = job.get("_qualification") or _qualification(title)
     exp    = _experience_display(job, title)
     salary = job.get("_salary", "")
-
     loc_str = _format_location(loc)
-
-    safe_company = _escape(company)
-    safe_title   = _escape(title)
-    safe_loc     = _escape(loc_str)
-    safe_qual    = _escape(qual)
-    safe_exp     = _escape(exp)
-
-    lines = []
-
-    # Urgency tag
-    urgency = _urgency_tag(posted)
-    if urgency:
-        lines.append(urgency.strip())
-        lines.append("")
-
-    # Header
-    lines += [
-        f"🧪 *{safe_company}*",
-        f"━━━━━━━━━━━━━━━━━━━━",
-        f"💼 *Role:* {safe_title}",
-        f"📍 *Location:* {safe_loc}",
-    ]
-
-    if safe_exp:
-        lines.append(f"👨‍💻 *Experience:* {safe_exp}")
-
-    if safe_qual and safe_qual.lower() not in ("not mentioned", ""):
-        lines.append(f"🎓 *Qualification:* {safe_qual}")
-
-    # Posted time — exact date/time in IST where available
     posted_str = _format_posted(posted, job.get("fetched_at", ""))
-    if posted_str:
-        lines.append(f"⏰ *Posted:* {_escape(posted_str)}")
 
-    # Salary (if mentioned)
-    if salary and salary.lower() not in ("not mentioned", ""):
-        lines.append(f"💰 *Salary:* {_escape(salary)}")
-
-    lines += [
-        "",
-        f"🔗 *Apply Here:*",
+    return render_job_post(
+        BRAND,
+        job,
+        _escape,
+        company,
+        title,
+        loc_str,
+        exp,
+        qual if qual and qual.lower() not in ("not mentioned", "") else "",
+        posted_str,
         url,
-    ]
-    if source:
-        lines.append(f"\n📋 _{_escape(source)}_")
-
-    return "\n".join(lines)
+        source=source,
+        posted_today=_posted_today(posted),
+        salary=salary,
+    )
 
 
 def send_job(job):
