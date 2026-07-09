@@ -63,30 +63,69 @@ INDIAN_TAX_BLOCKLIST = re.compile(
     re.IGNORECASE,
 )
 
-# Resume-aligned: Intuit / Thomson Reuters / H&R Block tax software QA & e-file
+# Top 50 titles + 100 keywords — tax software testing only
 TESTING_KEYWORDS = [
-    "tax software testing", "tax software qa", "tax application testing",
-    "tax product testing", "tax validation", "tax diagnostics",
-    "tax qa", "tax testing", "tax tester",
-    "e-file analyst", "e-file testing", "e-file compliance", "e-file processing",
-    "efile testing", "efile compliance", "print e-file", "print and e-file",
-    "automated test system", "ats test", "tax ats", "ats test case", "ats test client",
-    "mef testing", "schema validation", "xml schema", "xsd validation", "xml tagging",
-    "state schema", "schema testing", "schema update",
-    "form 1040", "form 1041", "1040 testing", "1041 testing", "tax form testing",
-    "lacerte", "proseries", "ultratax", "onesource", "one source",
-    "go-system", "go system", "gosystem", "drake tax", "drake",
-    "atx", "taxslayer", "taxact", "taxwise", "proconnect",
-    "prosystem fx", "prosystem", "crosslink", "h&r block", "hr block",
-    "intuit tax", "thomson reuters tax", "regulatory analyst",
-    "filing product", "lasermap", "data conversion",
+    # E-File / ATS / Schema (1–25)
+    "ats", "e-file", "efile", "ats submission", "e-file approval", "print approval",
+    "e-file compliance", "print compliance", "state e-file", "federal e-file",
+    "ats test client", "e-file authorization", "dor approval", "mef", "modernized e-file",
+    "e-file diagnostics", "e-file schema", "e-file module", "electronic filing",
+    "state authority approval", "xml schema", "xsd schema", "schema validation",
+    "schema mapping", "xml tagging",
+    # Tax Software (26–50)
+    "lacerte", "proseries", "gosystem", "onesource", "ultratax", "cch axcess",
+    "prosystem fx", "drake", "atx", "taxwise", "taxact", "taxslayer", "proconnect",
+    "crosslink", "gosystem tax rs", "tax software", "tax software qa", "tax form software",
+    "tax platform", "tax system", "tax application", "tax tool", "tax engine",
+    "tax solution", "filing software",
+    # QA / Testing — tax context required via filter (51–70)
+    "tax qa", "tax testing", "tax tester", "tax software testing", "tax software qa",
+    "manual testing", "regression testing", "functional testing", "uat",
+    "user acceptance testing", "test cases", "test scenarios", "bug tracking",
+    "defect management", "pre-production testing", "post-production testing",
+    "compliance testing", "software validation", "end-to-end testing",
+    "integration testing", "smoke testing", "sanity testing", "quality assurance",
+    # Tax Forms (71–80)
+    "form 1040", "form 1041", "form 1120", "form 1120s", "form 1065", "form 990",
+    "schedule k-1", "individual tax", "corporate tax", "partnership tax",
+    # Tools / Tech (81–90)
+    "lasermap", "2d barcode", "xmlspy", "altova xmlspy",
+    # Regulatory / Compliance (91–100)
+    "tax compliance", "regulatory compliance", "tax form development", "filing product",
+    "government liaison", "state authority", "irs compliance", "dor", "tax law changes",
+    "compliance qa",
+    # Title keywords (Top 50 roles)
+    "tax software qa analyst", "us tax software qa analyst", "tax software tester",
+    "tax qa engineer", "senior tax qa analyst", "tax qa specialist",
+    "tax software quality engineer", "us tax qa engineer", "tax quality assurance analyst",
+    "senior tax software qa analyst", "e-file analyst", "e-file qa analyst",
+    "e-file compliance analyst", "e-file specialist", "xml schema analyst",
+    "tax schema analyst", "ats analyst", "schema validation analyst", "tax schema developer",
+    "regulatory qa analyst", "regulatory qa engineer", "tax regulatory analyst",
+    "compliance qa analyst", "tax compliance qa analyst", "form qa analyst",
+    "tax form qa analyst", "tax form tester", "tax compliance tester",
+    "regulatory compliance qa", "tax manual test engineer", "tax functional qa analyst",
+    "tax functional test analyst", "tax regression test analyst", "tax uat analyst",
+    "tax test analyst", "tax software test analyst", "tax test engineer", "tax qa tester",
+    "tax qa lead", "tax qa manager", "tax test lead", "tax qa engineer lead",
+    "lead qa e-file analyst", "senior tax qa engineer", "tax qa consultant", "tax test manager",
 ]
 
 TAX_SOFTWARE_PRODUCTS = re.compile(
     r"\b("
     r"lacerte|proseries|ultratax|onesource|one\s*source|"
     r"go[\s-]*system|gosystem|drake|atx|taxslayer|taxact|taxwise|"
-    r"proconnect|prosystem|crosslink|h\s*&\s*r\s*block|intuit|thomson\s*reuters"
+    r"proconnect|prosystem|crosslink|cch\s*axcess|h\s*&\s*r\s*block|intuit|thomson\s*reuters|"
+    r"tax\s*software|tax\s*platform|tax\s*application|filing\s*software|tax\s*engine"
+    r")\b",
+    re.IGNORECASE,
+)
+
+TAX_TESTING_CONTEXT = re.compile(
+    r"\b("
+    r"tax|e[\s-]*file|efile|ats|schema|xml|xsd|mef|regulatory|compliance|"
+    r"filing\s*product|form\s*104|form\s*112|form\s*106|form\s*990|"
+    r"lacerte|proseries|ultratax|onesource|gosystem|drake|filing\s*software"
     r")\b",
     re.IGNORECASE,
 )
@@ -95,37 +134,64 @@ TESTING_SIGNAL = re.compile(
     r"\b("
     r"testing|tester|qa|quality|validation|diagnostics|"
     r"e[\s-]*file|efile|ats|schema|xml|xsd|mef|regulatory|compliance|"
-    r"automated\s*test|test\s*case|test\s*client|bug|defect"
+    r"automated\s*test|test\s*case|test\s*client|test\s*scenario|bug|defect|"
+    r"manual\s*test|functional\s*test|regression|uat|smoke|sanity|integration"
     r")\b",
     re.IGNORECASE,
 )
 
-GENERIC_TESTING_BLOCKLIST = re.compile(
+# Pure IT testing — block only when no tax software context
+GENERIC_IT_BLOCKLIST = re.compile(
     r"\b("
-    r"\bsdet\b|\buat\b|manual\s*tester|automation\s*tester|"
-    r"software\s*testing|quality\s*assurance|qa\s*engineer|test\s*engineer|"
-    r"selenium|cypress|playwright|api\s*testing|performance\s*testing|"
-    r"regression\s*testing|functional\s*testing|black\s*box|white\s*box|"
-    r"mobile\s*testing|web\s*testing|devops|full\s*stack"
+    r"\bsdet\b|selenium|cypress|playwright|appium|"
+    r"mobile\s*testing|web\s*testing|api\s*testing|performance\s*testing|"
+    r"devops|full\s*stack|\.net\s*testing|java\s*developer"
+    r")\b",
+    re.IGNORECASE,
+)
+
+# Generic QA titles (31–50) — need tax/e-file/schema in title or company
+GENERIC_QA_TITLE = re.compile(
+    r"\b("
+    r"manual\s*test\s*engineer|functional\s*(?:qa|test)\s*analyst|"
+    r"regression\s*test\s*analyst|\buat\s*analyst|"
+    r"(?<!tax\s)(?<!e[\s-]*file\s)test\s*analyst|"
+    r"software\s*test\s*analyst|software\s*tester|"
+    r"(?<!tax\s)test\s*engineer|(?<!tax\s)qa\s*tester|"
+    r"(?<!tax\s)qa\s*lead|(?<!tax\s)senior\s*qa\s*analyst|(?<!tax\s)qa\s*manager|"
+    r"(?<!tax\s)test\s*lead|(?<!tax\s)qa\s*engineer\s*lead|"
+    r"senior\s*qa\s*engineer|(?<!tax\s)qa\s*consultant|(?<!tax\s)test\s*manager"
     r")\b",
     re.IGNORECASE,
 )
 
 TESTING_ROLE_TITLE = re.compile(
     r"\b("
-    r"tax\s*(?:software|application|product)\s*(?:testing|tester|qa|quality|validation)|"
-    r"tax\s*(?:qa|testing|tester|validation)\s*(?:engineer|analyst|lead|specialist)?|"
-    r"e[\s-]*file\s*(?:analyst|testing|tester|qa|specialist|engineer)|"
+    # Tax Software QA (1–10)
+    r"(?:us|u\.s\.|senior)?\s*tax\s*software\s*(?:qa|quality|testing|tester)\s*(?:analyst|engineer|specialist)?|"
+    r"tax\s*software\s*(?:tester|quality\s*engineer)|"
+    r"(?:senior|us|u\.s\.)?\s*tax\s*qa\s*(?:analyst|engineer|specialist)|"
+    r"tax\s*quality\s*assurance\s*analyst|senior\s*tax\s*software\s*qa\s*analyst|"
+    # E-File / Schema (11–20)
+    r"e[\s-]*file\s*(?:analyst|qa\s*analyst|compliance\s*analyst|specialist)|"
+    r"xml\s*schema\s*analyst|tax\s*schema\s*(?:analyst|developer)|"
+    r"ats\s*analyst|schema\s*validation\s*analyst|"
+    # Regulatory QA (21–30)
+    r"(?:tax\s*)?regulatory\s*(?:qa|compliance)\s*(?:analyst|engineer)|"
+    r"tax\s*regulatory\s*analyst|(?:tax\s*)?compliance\s*qa\s*analyst|"
+    r"tax\s*compliance\s*qa\s*analyst|form\s*qa\s*analyst|tax\s*form\s*qa\s*analyst|"
+    r"tax\s*form\s*tester|tax\s*compliance\s*tester|regulatory\s*compliance\s*qa|"
+    # Manual / Leadership with Tax prefix (31–50)
+    r"tax\s*(?:manual\s*test|functional\s*(?:qa|test)|regression\s*test|uat|test|qa)\s*(?:engineer|analyst|tester|lead|manager)?|"
+    r"tax\s*software\s*test\s*analyst|tax\s*test\s*(?:engineer|analyst|lead|manager)|"
+    r"tax\s*qa\s*(?:lead|manager|consultant|tester)|"
+    r"lead\s*qa\s*e[\s-]*file\s*analyst|senior\s*tax\s*qa\s*(?:analyst|engineer)|"
+    r"tax\s*qa\s*engineer\s*lead|"
+    # Core tax software testing
+    r"tax\s*(?:software|application|product)\s*(?:testing|tester|qa|validation)|"
     r"qa\s*(?:&|and)?\s*e[\s-]*file|e[\s-]*file\s*(?:&|and)?\s*qa|"
-    r"ats\s*(?:analyst|tester|engineer|specialist)|automated\s*test\s*system|"
-    r"regulatory\s*analyst|filing\s*product|"
-    r"tax\s*regulatory|regulatory\s*(?:qa|testing|analyst).{0,15}tax|"
-    r"lacerte\s*(?:qa|testing|tester)|proseries\s*(?:qa|testing|tester)|"
-    r"ultratax\s*(?:qa|testing|tester)|onesource\s*(?:qa|testing|tester)|"
-    r"gosystem\s*(?:qa|testing|tester)|go[\s-]*system\s*(?:qa|testing|tester)|"
-    r"drake\s*tax\s*(?:qa|testing|tester)|"
     r"schema\s*(?:validation|testing|analyst)|xml\s*(?:schema|testing|validation)|"
-    r"tax\s*(?:schema|xml|e[\s-]*file|ats|validation|diagnostics)"
+    r"tax\s*(?:schema|xml|e[\s-]*file|ats|validation|diagnostics)|filing\s*product"
     r")\b",
     re.IGNORECASE,
 )
@@ -185,8 +251,12 @@ def _passes_early_filter(title, company, role_title_pattern):
     return True
 
 
+def _has_tax_testing_context(text):
+    return bool(TAX_TESTING_CONTEXT.search(text))
+
+
 def is_tax_software_testing_job(job):
-    """Resume-aligned: tax software QA, e-file, ATS, schema testing only."""
+    """Top 50 tax software testing titles + 100 keywords — tax context required."""
     desc = (job.get("description") or "").lower()
     title = (job.get("title") or "").lower()
     company = (job.get("company") or "").lower()
@@ -195,10 +265,13 @@ def is_tax_software_testing_job(job):
     if INDIAN_TAX_BLOCKLIST.search(title) or INDIAN_TAX_BLOCKLIST.search(company):
         return False
 
+    if GENERIC_IT_BLOCKLIST.search(blob) and not _has_tax_testing_context(blob):
+        return False
+
     if TESTING_ROLE_TITLE.search(title):
         if BLOCKLIST.search(title) or BLOCKLIST.search(company):
             return False
-        if GENERIC_TESTING_BLOCKLIST.search(title) and not re.search(r"\btax\b|e[\s-]*file|efile|ats|schema|lacerte|proseries", title):
+        if GENERIC_QA_TITLE.search(title) and not _has_tax_testing_context(f"{title} {company}"):
             return False
         print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: tax software testing title")
         return True
@@ -207,30 +280,25 @@ def is_tax_software_testing_job(job):
         return False
     if INDIAN_TAX_BLOCKLIST.search(blob):
         return False
-    if GENERIC_TESTING_BLOCKLIST.search(blob) and not re.search(
-        r"\btax\b|e[\s-]*file|efile|ats|schema|lacerte|proseries|ultratax|onesource|gosystem|drake",
-        blob,
-    ):
+    if GENERIC_QA_TITLE.search(title) and not _has_tax_testing_context(blob):
+        return False
+    if GENERIC_IT_BLOCKLIST.search(blob) and not _has_tax_testing_context(blob):
         return False
 
     matched = _keyword_hits(blob, TESTING_KEYWORDS)
     if not matched:
         return False
 
-    # Product mention alone is not enough — need explicit testing/e-file/ATS signal
+    if not _has_tax_testing_context(blob):
+        return False
+
     has_product = TAX_SOFTWARE_PRODUCTS.search(blob)
     has_testing_signal = TESTING_SIGNAL.search(blob)
-    has_tax_testing_kw = any(
-        kw in matched
-        for kw in (
-            "tax software testing", "tax software qa", "tax application testing",
-            "tax product testing", "tax qa", "tax testing", "tax tester",
-            "tax validation", "tax diagnostics", "e-file analyst", "e-file testing",
-            "efile testing", "automated test system", "ats test", "tax ats",
-            "tax form testing", "form 1040", "form 1041",
-        )
+    has_core_kw = any(
+        "tax" in kw or "e-file" in kw or "efile" in kw or "ats" in kw or "schema" in kw or "mef" in kw
+        for kw in matched
     )
-    if has_tax_testing_kw or (has_product and has_testing_signal):
+    if has_core_kw or (has_product and has_testing_signal):
         print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: {matched}")
         return True
     return False
