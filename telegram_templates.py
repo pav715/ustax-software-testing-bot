@@ -10,13 +10,13 @@ BRANDS = {
     "mortgage": {"label": "Mortgage & Loan", "icon": "🏠", "spark": "🏦", "tag": "loan"},
 }
 
-# (start_h, end_h, slot, mood_emoji, divider)
+# (start_h, end_h, slot, divider) — hook is always line 1 (notification preview)
 TIME_SLOTS = [
-    (8, 11, "morning", "☀️🌅✨", "╭━━ 🌞 MORNING DROP 🌞 ━━╮"),
-    (12, 15, "afternoon", "🔥🟠💫", "▰▰▰ 🔥 HOT JOB 🔥 ▰▰▰"),
-    (16, 18, "late_afternoon", "⚡💥⭐", "━━ ⚡ FRESH OPENING ⚡ ━━"),
-    (19, 21, "evening", "🌇🟣✨", "✦ ─── ✦ ─── ✦ ─── ✦"),
-    (22, 23, "night", "🌙💎🔵", "◇ ─── ◇ ─── ◇ ─── ◇"),
+    (8, 11, "morning", "╭━━ 🌞 MORNING DROP 🌞 ━━╮"),
+    (12, 15, "afternoon", "▰▰▰ 🔥 HOT JOB 🔥 ▰▰▰"),
+    (16, 18, "late_afternoon", "━━ ⚡ FRESH OPENING ⚡ ━━"),
+    (19, 21, "evening", "✦ ─── ✦ ─── ✦ ─── ✦"),
+    (22, 23, "night", "◇ ─── ◇ ─── ◇ ─── ◇"),
 ]
 
 # Funny / trendy / creative top hooks — rotate per job
@@ -101,10 +101,10 @@ def _ist_hour():
 
 def _theme():
     h = _ist_hour()
-    for start, end, slot, mood, divider in TIME_SLOTS:
+    for start, end, slot, divider in TIME_SLOTS:
         if start <= h <= end:
-            return {"slot": slot, "mood": mood, "divider": divider}
-    return {"slot": "default", "mood": "🔥✨", "divider": "━━━━━━━━━━━━━━━━━━━━"}
+            return {"slot": slot, "divider": divider}
+    return {"slot": "default", "divider": "━━━━━━━━━━━━━━━━━━━━"}
 
 
 def _pick(pool, job, salt=""):
@@ -154,7 +154,7 @@ def render_job_post(
         extras.append(f"💰 *Salary:* {escape(salary)}")
     extra = "\n".join(extras)
 
-    urgent = "🚨 *Posted TODAY — apply fast!* 🚨\n\n" if posted_today else ""
+    urgent = "🚨 *Posted TODAY — apply fast!* 🚨" if posted_today else ""
     company_block = f"🔥🔥 *{co}* 🔥🔥"
     role = f"💼 *Role:*\n*{ti}*"
     loc = f"📍 *Location:*\n*{lo}*"
@@ -162,12 +162,13 @@ def render_job_post(
     if source:
         apply += f"\n\n📋 _via {escape(source)}_"
 
+    # Hook is ALWAYS line 1 — shows in Telegram notification bar
     if layout == 0:
-        body = [urgent + theme["mood"], hook, "", company_block, theme["divider"], role, loc, extra, apply]
+        body = [hook, urgent, "", company_block, theme["divider"], role, loc, extra, apply]
     elif layout == 1:
         body = [
-            urgent + f"👀 _Psst... {brand['tag']} role alert_",
             hook,
+            urgent,
             f"{brand['icon']} {brand['spark']}",
             company_block,
             role.replace("💼", "🎯"),
@@ -177,7 +178,8 @@ def render_job_post(
         ]
     elif layout == 2:
         body = [
-            urgent + hook,
+            hook,
+            urgent,
             theme["divider"],
             company_block,
             f"▸ *Role* → *{ti}*",
@@ -187,8 +189,8 @@ def render_job_post(
         ]
     elif layout == 3:
         body = [
-            urgent + theme["mood"],
             hook,
+            urgent,
             f"🏢 *{co}* {brand['spark']}🔥",
             "┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈",
             f"💼 *{ti}*",
@@ -198,8 +200,8 @@ def render_job_post(
         ]
     elif layout == 4:
         body = [
-            urgent + hook,
-            "",
+            hook,
+            urgent,
             f"📢 *{co}* wants someone like you!",
             theme["divider"],
             role,
@@ -209,8 +211,8 @@ def render_job_post(
         ]
     else:
         body = [
-            urgent + f"✨ *{brand['label']}* ✨",
             hook,
+            urgent,
             company_block,
             theme["divider"],
             role,
