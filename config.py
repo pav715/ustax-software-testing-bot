@@ -3,20 +3,19 @@ import os
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
 CHAT_ID   = os.environ.get("CHAT_ID", "")
 
-# LinkedIn search — Tax Software Testing / QA
+# LinkedIn search — Tax Software Testing ONLY (no generic SDET/UAT/QA)
 KEYWORDS = [
-    "Tax Technology",
-    "Tax Software",
     "Tax Software Testing",
+    "Tax Software QA",
     "Tax Application Testing",
+    "Tax Technology Testing",
     "Tax QA Engineer",
-    "Tax Automation Engineer",
     "Tax Test Engineer",
+    "Tax Automation Testing",
     "E-File Testing",
-    "E-File",
-    "Tax QA",
-    "Tax Automation",
-    "XML Schema",
+    "Tax E-File Testing",
+    "Tax ATS",
+    "Tax Validation",
     "Lacerte Testing",
     "ProSeries Testing",
     "UltraTax Testing",
@@ -24,15 +23,9 @@ KEYWORDS = [
     "OneSource Testing",
     "Drake Tax Testing",
     "MEF Testing",
-    "Tax ATS",
-    "Tax Validation",
-    "Tax Software Developer",
-    "Tax Technology Analyst",
     "Tax Product Testing",
-    "Tax Regression Testing",
-    "Tax Functional Testing",
-    "Tax UAT",
-    "Tax SDET",
+    "Tax Software",
+    "Tax Technology",
 ]
 
 LOCATIONS = [

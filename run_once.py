@@ -67,25 +67,32 @@ TESTING_KEYWORDS = [
     "tax software", "tax technology", "tax tech", "tax qa", "tax testing", "tax tester",
     "tax automation", "tax application", "tax ats", "tax e-file", "tax xml", "tax schema",
     "tax gosystem", "tax lacerte", "tax proseries", "tax onesource", "tax ultratax",
-    "tax mef", "tax xsd", "tax validation", "tax uat", "tax sdet", "tax functional",
-    "tax regression", "tax product", "software testing", "qa engineer", "sdet",
-    "quality assurance", "test engineer", "automation engineer", "manual tester",
-    "form 1040", "form 1041", "irs", "dor", "efile", "e-file", "xml schema",
-    "lacerte", "proseries", "ultratax", "onesource", "gosystem", "drake", "atx",
-    "selenium", "cypress", "playwright", "api testing", "regression testing",
-    "functional testing", "uat", "black box", "white box", "test plan", "test case",
+    "tax mef", "tax xsd", "tax validation", "tax product testing", "tax software testing",
+    "tax application testing", "tax technology testing", "tax automation testing",
+    "e-file testing", "efile testing", "mef testing", "xml schema testing",
+    "lacerte testing", "proseries testing", "ultratax testing", "onesource testing",
+    "gosystem testing", "drake tax testing",
 ]
+
+# Reject generic QA/SDET/UAT roles with no tax software context
+GENERIC_TESTING_BLOCKLIST = re.compile(
+    r"\b("
+    r"\bsdet\b|\buat\b|manual\s*tester|automation\s*tester|"
+    r"software\s*testing|quality\s*assurance|qa\s*engineer|test\s*engineer|"
+    r"selenium|cypress|playwright|api\s*testing|performance\s*testing|"
+    r"regression\s*testing|functional\s*testing|black\s*box|white\s*box"
+    r")\b",
+    re.IGNORECASE,
+)
 
 TESTING_ROLE_TITLE = re.compile(
     r"\b("
-    r"tax\s*(?:software|technology|tech|qa|quality|testing|tester|automation|application|product|functional|regression|uat|sdet)|"
-    r"(?:software|technology|tech|application|product)\s*(?:testing|tester|qa|sdet).{0,30}tax|"
-    r"tax.{0,30}(?:software|technology|qa|testing|tester|automation|sdet|uat)|"
-    r"qa\s*(?:engineer|analyst|lead|tester).{0,25}tax|tax\s*qa\s*(?:engineer|analyst|lead|tester)|"
-    r"test\s*(?:engineer|analyst|lead).{0,25}tax|tax\s*test\s*(?:engineer|analyst|lead)|"
-    r"sdet.{0,20}tax|tax\s*sdet|automation\s*(?:engineer|tester).{0,20}tax|"
-    r"e[\s-]*file|efile|xml\s*schema|tax\s*ats|tax\s*validation|mef\s*testing|"
-    r"lacerte|proseries|ultratax|onesource|gosystem|drake\s*tax|atx"
+    r"tax\s*(?:software|technology|tech|qa|quality|testing|tester|automation|application|product)\s*(?:testing|tester|qa|engineer|analyst|lead)?|"
+    r"tax\s*(?:software|technology|tech|qa|testing|tester|automation|application|product)|"
+    r"(?:software|technology|tech|application|product)\s*(?:testing|tester|qa)\s*(?:engineer|analyst|lead)?\s*(?:for\s*)?tax|"
+    r"tax.{0,20}(?:software|technology|qa|testing|tester|automation)\s*(?:testing|tester|qa|engineer)?|"
+    r"e[\s-]*file\s*testing|efile\s*testing|tax\s*e[\s-]*file|tax\s*ats|tax\s*validation|mef\s*testing|"
+    r"lacerte\s*testing|proseries\s*testing|ultratax\s*testing|onesource\s*testing|gosystem\s*testing|drake\s*tax\s*testing"
     r")\b",
     re.IGNORECASE,
 )
@@ -146,7 +153,7 @@ def _passes_early_filter(title, company, role_title_pattern):
 
 
 def is_tax_software_testing_job(job):
-    """Accept tax software/QA titled roles first; then keyword match."""
+    """Only tax software / tax application testing roles — no generic SDET/UAT/QA."""
     desc = (job.get("description") or "").lower()
     title = (job.get("title") or "").lower()
     company = (job.get("company") or "").lower()
@@ -158,12 +165,16 @@ def is_tax_software_testing_job(job):
     if TESTING_ROLE_TITLE.search(title):
         if BLOCKLIST.search(title) or BLOCKLIST.search(company):
             return False
-        print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: testing role title")
+        if GENERIC_TESTING_BLOCKLIST.search(title) and "tax" not in title:
+            return False
+        print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: tax software testing title")
         return True
 
     if BLOCKLIST.search(blob):
         return False
     if INDIAN_TAX_BLOCKLIST.search(blob):
+        return False
+    if GENERIC_TESTING_BLOCKLIST.search(blob) and "tax" not in blob:
         return False
 
     matched = _keyword_hits(blob, TESTING_KEYWORDS)
