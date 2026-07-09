@@ -147,20 +147,30 @@ GENERIC_IT_BLOCKLIST = re.compile(
     re.IGNORECASE,
 )
 
-# Generic QA titles (31–50) — need tax/e-file/schema in title or company
+# Generic QA titles (31–50) — need tax/e-file/schema signal (no variable-width lookbehind)
 GENERIC_QA_TITLE = re.compile(
     r"\b("
     r"manual\s*test\s*engineer|functional\s*(?:qa|test)\s*analyst|"
     r"regression\s*test\s*analyst|\buat\s*analyst|"
-    r"(?<!tax\s)(?<!e[\s-]*file\s)test\s*analyst|"
-    r"software\s*test\s*analyst|software\s*tester|"
-    r"(?<!tax\s)test\s*engineer|(?<!tax\s)qa\s*tester|"
-    r"(?<!tax\s)qa\s*lead|(?<!tax\s)senior\s*qa\s*analyst|(?<!tax\s)qa\s*manager|"
-    r"(?<!tax\s)test\s*lead|(?<!tax\s)qa\s*engineer\s*lead|"
-    r"senior\s*qa\s*engineer|(?<!tax\s)qa\s*consultant|(?<!tax\s)test\s*manager"
+    r"test\s*analyst|software\s*test\s*analyst|software\s*tester|"
+    r"test\s*engineer|qa\s*tester|qa\s*lead|senior\s*qa\s*analyst|"
+    r"qa\s*manager|test\s*lead|qa\s*engineer\s*lead|"
+    r"senior\s*qa\s*engineer|qa\s*consultant|test\s*manager"
     r")\b",
     re.IGNORECASE,
 )
+
+
+def _is_generic_qa_title(title):
+    """Generic IT QA title without tax/e-file in the title itself."""
+    if not title or not GENERIC_QA_TITLE.search(title):
+        return False
+    t = title.lower()
+    if re.search(r"\btax\b", t):
+        return False
+    if re.search(r"e[\s-]*file|efile", t):
+        return False
+    return True
 
 TESTING_ROLE_TITLE = re.compile(
     r"\b("
@@ -269,7 +279,7 @@ def is_tax_software_testing_job(job):
     if TESTING_ROLE_TITLE.search(title):
         if BLOCKLIST.search(title) or BLOCKLIST.search(company):
             return False
-        if GENERIC_QA_TITLE.search(title) and not _has_required_tax_signal(blob):
+        if _is_generic_qa_title(title) and not _has_required_tax_signal(blob):
             return False
         if re.search(r"\btax\b", title) or _has_required_tax_signal(blob):
             print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: tax software testing title")
@@ -280,7 +290,7 @@ def is_tax_software_testing_job(job):
         return False
     if INDIAN_TAX_BLOCKLIST.search(blob):
         return False
-    if GENERIC_QA_TITLE.search(title) and not _has_required_tax_signal(blob):
+    if _is_generic_qa_title(title) and not _has_required_tax_signal(blob):
         return False
     if GENERIC_IT_BLOCKLIST.search(blob) and not _has_required_tax_signal(blob):
         return False
