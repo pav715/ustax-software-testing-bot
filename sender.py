@@ -135,16 +135,21 @@ def _qualification(title):
         return "Graduate / Post-Graduate (Accounting / Finance preferred)"
 
 
-def _experience(title, raw_exp):
-    if raw_exp and len(raw_exp) > 2:
-        return raw_exp
-    t = title.lower()
-    if any(x in t for x in ["senior", "manager", "lead"]):
-        return "5+ Years (US Tax / Accounting)"
-    elif any(x in t for x in ["associate", "junior", "jr"]):
-        return "1-2 Years (US Tax / Accounting)"
-    else:
-        return "2-5 Years (US Tax / Accounting)"
+def _format_location(loc):
+    loc = (loc or "India").strip()
+    ll = loc.lower()
+    if "remote" in ll and "(remote)" not in ll and "· remote" not in ll:
+        return loc
+    if "hyderabad" in ll and "hybrid" not in ll and "· hybrid" not in ll:
+        return f"{loc} · Hybrid"
+    return loc
+
+
+def _experience_display(job, title):
+    exp = (job.get("_experience") or job.get("experience") or "").strip()
+    if exp and exp.lower() not in ("not mentioned", "n/a", ""):
+        return exp
+    return "See job description ↓"
 
 
 def format_job(job):
@@ -156,16 +161,10 @@ def format_job(job):
     posted  = job.get("posted", "")
 
     qual   = job.get("_qualification") or _qualification(title)
-    exp    = job.get("_experience")    or _experience(title, job.get("experience", ""))
+    exp    = _experience_display(job, title)
     salary = job.get("_salary", "")
 
-    # Location formatting
-    if "remote" in loc.lower():
-        loc_str = f"{loc} (Remote)"
-    elif "hyderabad" in loc.lower():
-        loc_str = "Hyderabad (Hybrid)"
-    else:
-        loc_str = loc
+    loc_str = _format_location(loc)
 
     safe_company = _escape(company)
     safe_title   = _escape(title)
@@ -183,15 +182,17 @@ def format_job(job):
 
     # Header
     lines += [
-        f"🔥 *Job Opportunity at {safe_company}*",
-        "",
+        f"🧪 *{safe_company}*",
+        f"━━━━━━━━━━━━━━━━━━━━",
         f"💼 *Role:* {safe_title}",
         f"📍 *Location:* {safe_loc}",
     ]
 
-    if safe_exp and safe_exp.lower() not in ("not mentioned", ""):
+    if safe_exp:
         lines.append(f"👨‍💻 *Experience:* {safe_exp}")
 
+    if safe_qual and safe_qual.lower() not in ("not mentioned", ""):
+        lines.append(f"🎓 *Qualification:* {safe_qual}")
 
     # Posted time — exact date/time in IST where available
     posted_str = _format_posted(posted, job.get("fetched_at", ""))
@@ -204,7 +205,8 @@ def format_job(job):
 
     lines += [
         "",
-        f"🔗 *Apply Here:*\n{url}",
+        f"🔗 *Apply Here:*",
+        url,
     ]
     if source:
         lines.append(f"\n📋 _{_escape(source)}_")
@@ -260,11 +262,11 @@ def send_and_pin_welcome():
         "🎯 This channel posts *fresh Tax Software Testing & QA roles* hourly — "
         "automatically sourced from LinkedIn, Big 4 firms and top IT/BPO companies\\.\n\n"
         "💼 *Roles we cover:*\n"
-        "• US Tax Preparer / Reviewer\n"
-        "• Tax Analyst / Compliance Analyst\n"
-        "• Tax Consultant / Associate\n"
-        "• Tax Software / QA / E\\-file roles\n"
-        "• Senior / Manager US Tax roles\n\n"
+        "• Tax Software QA / Testing\n"
+        "• E\\-File / ATS / MeF Analyst\n"
+        "• XML Schema / Tax Form QA\n"
+        "• Regulatory & Compliance QA\n"
+        "• Lacerte / ProSeries / GoSystem QA\n\n"
         "📍 *Locations:* Hyderabad, Bangalore, Chennai, Remote & more\n\n"
         "🔔 *Turn on notifications* so you never miss a job\\!\n\n"
         "✅ Good luck with your job search\\! 🚀"

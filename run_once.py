@@ -13,6 +13,7 @@ if sys.stdout.encoding != 'utf-8':
     sys.stdout.reconfigure(encoding='utf-8')
 from scraper import fetch_all_jobs, SESSION
 from sender import send_job, send_daily_summary, send_fail_alert
+from experience_utils import extract_experience_from_job, pick_linkedin_criteria_experience
 
 SEEN_FILE  = "seen_jobs.json"
 STATS_FILE = "stats.json"
@@ -114,12 +115,14 @@ TESTING_KEYWORDS = [
 # Required signal — at least ONE must be present (not product names alone)
 REQUIRED_TAX_SIGNAL = re.compile(
     r"\b("
-    r"tax\s*software|"
+    r"tax\s*software|tax\s*(?:qa|testing|tester)|"
     r"\bats\b|automated\s*test\s*system|"
     r"e[\s-]*file|efile|"
     r"\bxml\b|xml\s*schema|xsd|"
     r"1040|form\s*1040|"
-    r"\bdor\b|department\s*of\s*revenue"
+    r"\bdor\b|department\s*of\s*revenue|"
+    r"\bmef\b|modernized\s*e[\s-]*file|"
+    r"lacerte|proseries|gosystem|ultratax|onesource"
     r")\b",
     re.IGNORECASE,
 )
@@ -268,10 +271,10 @@ def is_tax_software_testing_job(job):
             return False
         if GENERIC_QA_TITLE.search(title) and not _has_required_tax_signal(blob):
             return False
-        if not _has_required_tax_signal(blob):
-            return False
-        print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: tax software testing title")
-        return True
+        if re.search(r"\btax\b", title) or _has_required_tax_signal(blob):
+            print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: tax software testing title")
+            return True
+        return False
 
     if BLOCKLIST.search(blob):
         return False
@@ -433,14 +436,12 @@ def enrich_job(job):
                         soup.find("section", class_=re.compile(r"description"))
                     )
                     if desc_div:
-                        job["description"] = desc_div.get_text(" ", strip=True)[:2000]
+                        job["description"] = desc_div.get_text(" ", strip=True)[:4000]
                         fetched = True
                     criteria = soup.find_all("span", class_=re.compile(r"description__job-criteria-text"))
-                    for c in criteria:
-                        text = c.get_text(strip=True)
-                        if re.search(r"year|experience|mid|senior|entry", text, re.IGNORECASE):
-                            if not job.get("experience") or len(job["experience"]) < 3:
-                                job["experience"] = text
+                    exp_line = pick_linkedin_criteria_experience(criteria)
+                    if exp_line:
+                        job["experience"] = exp_line
     except Exception as e:
         log(f"  [Enrich] error: {e}")
     if fetched:
@@ -448,22 +449,8 @@ def enrich_job(job):
     return job
 
 
-def extract_experience(desc, title):
-    patterns = [
-        r"(\d+\+?\s*(?:to|-)\s*\d*\+?\s*years?\s*(?:of\s*)?(?:experience|exp)?[^\n.]*)",
-        r"((?:minimum|min\.?|atleast|at\s*least)\s*\d+\+?\s*years?[^\n.]*)",
-        r"(\d+\+?\s*years?\s*(?:of\s*)?(?:relevant\s*)?experience[^\n.]*)",
-    ]
-    for p in patterns:
-        m = re.search(p, desc, re.IGNORECASE)
-        if m:
-            return m.group(1).strip()[:100]
-    t = title.lower()
-    if any(x in t for x in ["senior", "manager", "lead"]):
-        return "5+ Years (Tax Software QA)"
-    elif any(x in t for x in ["associate", "junior", "jr"]):
-        return "1-2 Years (Tax Software QA)"
-    return "2-5 Years (Tax Software QA)"
+def extract_experience(desc, title="", raw_exp=""):
+    return extract_experience_from_job(desc, raw_exp)
 
 
 def extract_qualification(desc, title):
@@ -568,7 +555,7 @@ def main():
         desc  = job.get("description", "")
         title = job.get("title", "")
         if not job.get("_experience"):
-            job["_experience"] = extract_experience(desc, title)
+            job["_experience"] = extract_experience(desc, title, job.get("experience", ""))
         if not job.get("_qualification"):
             job["_qualification"] = extract_qualification(desc, title)
 
