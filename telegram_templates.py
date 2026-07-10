@@ -1,14 +1,8 @@
-"""Professional Telegram job posts — clean channel style, not spammy."""
+"""Professional + creative Telegram posts — company-first hooks, clean details."""
 import hashlib
 from datetime import datetime, timedelta
 
 IST = timedelta(hours=5, minutes=30)
-
-BRANDS = {
-    "tax": {"label": "US Tax Jobs", "icon": "💼"},
-    "testing": {"label": "Tax Software QA", "icon": "🧪"},
-    "mortgage": {"label": "Mortgage & Loan", "icon": "🏠"},
-}
 
 TIME_SLOTS = [
     (8, 11, "morning"),
@@ -18,57 +12,61 @@ TIME_SLOTS = [
     (22, 23, "night"),
 ]
 
-# Friendly opener — line 1 for notification, kept professional
-HOOKS = {
+# Creative hooks — {co} = company name (bold in message)
+COMPANY_HOOKS = [
+    "☕ *{co}* just opened a new role for you — come see & apply 👇",
+    "🔥 *{co}* is hiring — your next move could start here 🚀",
+    "👀 *{co}* posted a role that might fit you — check below",
+    "📢 New from *{co}* — open the details & apply 👇",
+    "✨ *{co}* has a fresh opening waiting for you 👀",
+    "📞 Someone at *{co}* is looking for you — see the role below",
+    "🚀 *{co}* wants talent like you — role details below 👇",
+    "💼 *{co}* dropped a new opportunity — worth a look 👀",
+    "🎯 *{co}* is calling — new role alert below 📋",
+    "⚡ Fresh role at *{co}* — scroll down & apply 👇",
+    "😄 Plot twist: *{co}* might be your next company 👀",
+    "🌟 *{co}* is open for a new hire — could it be you?",
+    "👇 Stop scrolling — *{co}* has something for you",
+    "🔔 *{co}* just listed a new opening — details below",
+    "💡 *{co}* is looking for someone like you — apply below 👇",
+]
+
+TIME_HOOKS = {
     "morning": [
-        "☕ *Good morning* — a new opportunity is open for you",
-        "🌅 *Morning update* — fresh role posted, see details below",
-        "☀️ *New day, new opening* — worth a look 👇",
-        "💼 *Morning hire alert* — role details below",
+        "☕ Good morning! *{co}* has a new role open for you 👀",
+        "🌅 Rise & shine — *{co}* is hiring today 🚀",
+        "☀️ Start your day right — *{co}* posted a fresh opening",
     ],
     "afternoon": [
-        "🌞 *Afternoon update* — new opportunity available",
-        "💼 *New role posted* — details below",
-        "📋 *Fresh opening* — check if this fits you",
-        "👀 *New opportunity* — see company & role below",
+        "🌞 Afternoon pick — *{co}* has a new role for you 👀",
+        "🍽️ Lunch break done? *{co}* is hiring — see below 👇",
+        "💼 *{co}* just posted — check if this fits you",
     ],
     "late_afternoon": [
-        "⚡ *Evening update* — new role just posted",
-        "💼 *Before you log off* — one opening to review",
-        "📋 *New opportunity* — details below",
-        "👀 *Fresh role alert* — see below",
+        "⚡ Before you log off — *{co}* has a new opening 👀",
+        "🌆 *{co}* posted a role — quick look before 6 PM?",
+        "📲 *{co}* is hiring — one opening worth checking 👇",
     ],
     "evening": [
-        "🌆 *Evening update* — new opportunity available",
-        "💼 *New opening tonight* — details below",
-        "📋 *Fresh role* — check details below",
-        "👀 *Opportunity alert* — see below",
+        "🌆 Evening alert — *{co}* has a new role for you 👀",
+        "🍿 Netflix can wait — *{co}* is hiring tonight 😄",
+        "✨ *{co}* posted a fresh opening — see below 👇",
     ],
     "night": [
-        "🌙 *Night update* — new role posted",
-        "💼 *Late opening* — details below",
-        "📋 *Fresh opportunity* — see below",
-        "👀 *New role* — check before tomorrow",
-    ],
-    "default": [
-        "💼 *New opportunity* — details below",
-        "📋 *Fresh opening* — see company & role",
-        "👀 *New role posted* — check below",
-        "✨ *Job update* — details below",
+        "🌙 Night owl? *{co}* has a role open for you 👀",
+        "⭐ Late drop from *{co}* — check before tomorrow 👇",
+        "🦉 Still awake? *{co}* is hiring — details below",
     ],
 }
 
 CTAS = [
     "*Apply here* 👇",
     "*View & apply* 👇",
-    "*Interested? Apply below* 👇",
-    "*Tap to apply* 👇",
+    "*Tap below to apply* 👇",
+    "*Interested? Apply now* 👇",
 ]
 
-# Short, clean separators only — no heavy grids or symbol spam
 LINES = [
-    "────────────────────────",
-    "━━━━━━━━━━━━━━━━━━━━━━━━",
     "────────────────────────",
     "━━━━━━━━━━━━━━━━━━━━━━━━",
 ]
@@ -86,15 +84,23 @@ def _theme_slot():
     return "default"
 
 
-def _pick(pool, job, salt=""):
+def _pick_idx(job, n, salt):
     key = f"{job.get('title', '')}|{job.get('company', '')}|{_ist_hour()}|{salt}"
-    idx = int(hashlib.md5(key.encode()).hexdigest(), 16) % len(pool)
-    return pool[idx]
+    return int(hashlib.md5(key.encode()).hexdigest(), 16) % n
+
+
+def _creative_hook(job, co):
+    slot = _theme_slot()
+    if slot in TIME_HOOKS and _pick_idx(job, 3, "time_mix") == 0:
+        pool = TIME_HOOKS[slot]
+    else:
+        pool = COMPANY_HOOKS
+    template = pool[_pick_idx(job, len(pool), "hook")]
+    return template.format(co=co)
 
 
 def _layout_idx(job):
-    key = f"{job.get('title', '')}|{job.get('company', '')}|layout"
-    return int(hashlib.md5(key.encode()).hexdigest(), 16) % 4
+    return _pick_idx(job, 3, "layout")
 
 
 def render_job_post(
@@ -112,14 +118,14 @@ def render_job_post(
     posted_today=False,
     salary="",
 ):
-    hook = _pick(HOOKS.get(_theme_slot(), HOOKS["default"]), job, "hook")
-    cta = _pick(CTAS, job, "cta")
-    layout = _layout_idx(job)
-    line = LINES[layout]
-
     co, ti, lo = escape(company), escape(title), escape(location)
     ex = escape(experience) if experience else ""
     ps = escape(posted_str) if posted_str else ""
+
+    hook = _creative_hook(job, co)
+    cta = CTAS[_pick_idx(job, len(CTAS), "cta")]
+    layout = _layout_idx(job)
+    line = LINES[layout % len(LINES)]
 
     meta = []
     if ex:
@@ -134,50 +140,37 @@ def render_job_post(
     if source:
         apply += f"\n\n_via {escape(source)}_"
 
+    # Flow: creative note (with company) → company block → role → details
     if layout == 0:
-        # Card — single clean block
         body = [
             hook, "",
             line,
-            f"Company : *{co}*",
-            f"Role       : *{ti}*",
-            f"Location : *{lo}*",
+            f"🏢  *{co}*",
+            f"💼  *{ti}*",
+            f"📍  {lo}",
         ]
         if meta_line:
-            body.append(meta_line)
+            body.append(f"_{meta_line}_")
         body.extend([line, apply])
 
     elif layout == 1:
-        # Company first — bold & clear
         body = [
             hook, "",
-            f"🏢 *{co}*",
-            f"💼 *{ti}*",
-            f"📍 {lo}",
+            f"🏢  Company : *{co}*",
+            f"💼  Role       : *{ti}*",
+            f"📍  Location : {lo}",
         ]
         if meta_line:
             body.append(f"_{meta_line}_")
         body.extend(["", apply])
 
-    elif layout == 2:
-        # Compact — good for mobile scan
-        body = [
-            hook, "",
-            line,
-            f"*Company*  ·  *{co}*",
-            f"*Role*         ·  *{ti}*",
-            f"*Location*  ·  *{lo}*",
-        ]
-        if meta_line:
-            body.append(f"_{meta_line}_")
-        body.extend([line, apply])
-
     else:
-        # Minimal — least visual noise
         body = [
             hook, "",
-            f"*{co}* — *{ti}*",
-            f"📍 {lo}",
+            f"🏢  *{co}*",
+            "",
+            f"💼  Role : *{ti}*",
+            f"📍  {lo}",
         ]
         if meta_line:
             body.append(f"_{meta_line}_")
