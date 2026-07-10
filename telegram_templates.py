@@ -1,13 +1,13 @@
-"""Creative Telegram job posts — hook first, clean labels, rotating layouts."""
+"""Professional Telegram job posts — clean channel style, not spammy."""
 import hashlib
 from datetime import datetime, timedelta
 
 IST = timedelta(hours=5, minutes=30)
 
 BRANDS = {
-    "tax": {"label": "US Tax Jobs", "icon": "💼", "spark": "🇺🇸"},
-    "testing": {"label": "Tax Software QA", "icon": "🧪", "spark": "⚗️"},
-    "mortgage": {"label": "Mortgage & Loan", "icon": "🏠", "spark": "🏦"},
+    "tax": {"label": "US Tax Jobs", "icon": "💼"},
+    "testing": {"label": "Tax Software QA", "icon": "🧪"},
+    "mortgage": {"label": "Mortgage & Loan", "icon": "🏠"},
 }
 
 TIME_SLOTS = [
@@ -18,126 +18,60 @@ TIME_SLOTS = [
     (22, 23, "night"),
 ]
 
+# Friendly opener — line 1 for notification, kept professional
 HOOKS = {
     "morning": [
-        "☕ *Good morning!* A new opportunity is looking for you 👀",
-        "🌅 *Rise & shine!* Someone is calling you to join here 📞",
-        "🥐 *Morning tea done?* This job is waiting for you ☕",
-        "☀️ *New day, new role!* Don't scroll past this one 👇",
-        "🌞 *Good morning hire!* Your next move starts here 🚀",
-        "⏰ *Alarm went off?* So did this job posting 🔔",
-        "🌄 *Fresh morning drop!* Opportunity knocking at your door 🚪",
-        "💡 *Start your day right* — a role just opened up ✨",
+        "☕ *Good morning* — a new opportunity is open for you",
+        "🌅 *Morning update* — fresh role posted, see details below",
+        "☀️ *New day, new opening* — worth a look 👇",
+        "💼 *Morning hire alert* — role details below",
     ],
     "afternoon": [
-        "🍽️ *Lunch break over?* A new opportunity is looking for you 👀",
-        "🔥 *Afternoon alert!* Someone is calling you to join here 📞",
-        "⚡ *Midday magic!* This role won't wait forever ⏳",
-        "🎯 *Still browsing LinkedIn?* Stop — see below 👇",
-        "💼 *New opportunity alert!* Your skills are needed here 🙌",
-        "🚀 *Afternoon boost!* A company wants YOU today 💪",
-        "👀 *Psst...* a hot role just landed. Check it out 🔥",
-        "📢 *Breaking!* Someone posted a job with your name on it 😏",
+        "🌞 *Afternoon update* — new opportunity available",
+        "💼 *New role posted* — details below",
+        "📋 *Fresh opening* — check if this fits you",
+        "👀 *New opportunity* — see company & role below",
     ],
     "late_afternoon": [
-        "⚡ *Evening rush hour?* A new job is also rushing in 🏃",
-        "🌆 *Day not over yet!* Someone is calling you to join here 📞",
-        "🔥 *Last-minute drop!* Opportunity is looking for you 👀",
-        "💥 *Power hour!* Don't leave today without checking this 👇",
-        "🎯 *Still at the same desk?* A new job is waiting — see below 👀",
-        "⏰ *5 PM mood?* This opening says apply NOW 🚨",
-        "🌇 *Golden hour hire!* Perfect role before you log off ✨",
-        "📲 *Your phone is buzzing* — it's this job calling 📞",
+        "⚡ *Evening update* — new role just posted",
+        "💼 *Before you log off* — one opening to review",
+        "📋 *New opportunity* — details below",
+        "👀 *Fresh role alert* — see below",
     ],
     "evening": [
-        "🌆 *Evening vibes!* A new opportunity is looking for you 👀",
-        "🍿 *Netflix can wait!* Someone is calling you to join here 📞",
-        "✨ *Evening special!* Still at the same company? New job below 👇",
-        "🌙 *Before you unwind* — check this opening real quick 👀",
-        "💫 *Plot twist!* A role just opened while you were working 😮",
-        "🏠 *Heading home?* Take this opportunity with you 🎒",
-        "🔔 *Evening bell!* Your next career move is here 🚀",
-        "👀 *One more scroll?* This job is worth it — see below 👇",
+        "🌆 *Evening update* — new opportunity available",
+        "💼 *New opening tonight* — details below",
+        "📋 *Fresh role* — check details below",
+        "👀 *Opportunity alert* — see below",
     ],
     "night": [
-        "🌙 *Night owl?* A new opportunity is looking for you 👀",
-        "⭐ *Late night drop!* Someone is calling you to join here 📞",
-        "🦉 *Still awake?* Good — this job is waiting for you 🌙",
-        "💤 *Can't sleep?* Maybe it's this role calling you 📞",
-        "🌃 *Midnight opportunity!* Apply before others wake up 😏",
-        "✨ *Night shift special* — fresh opening just for you 🔥",
-        "👀 *Last check before bed?* Don't miss this one 👇",
-        "🚀 *While others sleep* — you could be applying 🌙",
+        "🌙 *Night update* — new role posted",
+        "💼 *Late opening* — details below",
+        "📋 *Fresh opportunity* — see below",
+        "👀 *New role* — check before tomorrow",
     ],
     "default": [
-        "🔥 *Fresh drop!* A new opportunity is looking for you 👀",
-        "📞 *Ring ring!* Someone is calling you to join here",
-        "👀 *Still at the same company?* A new job is waiting — see below 👇",
-        "✨ *New role alert!* Your next chapter starts here 🚀",
-        "💼 *Opportunity knocking!* Open the door below 👇",
-        "🎯 *This one's for you!* Check the details below 👀",
-        "⚡ *Just landed!* Don't let someone else grab it 🏃",
-        "🚨 *Job alert!* Someone wants YOU on their team 🙌",
+        "💼 *New opportunity* — details below",
+        "📋 *Fresh opening* — see company & role",
+        "👀 *New role posted* — check below",
+        "✨ *Job update* — details below",
     ],
 }
 
 CTAS = [
-    "👇👇 *Tap below — your future is waiting* 👇👇",
-    "👉👉 *Someone is calling you — apply here* 👉👉",
-    "⬇️⬇️ *New opportunity below — don't scroll past!* ⬇️⬇️",
-    "👇 *Still reading? Just apply already* 😄👇",
-    "🔗 *Your sign is here ↓ Click & apply*",
-    "📲 *They're waiting for your application ↓*",
-    "🏃 *Run don't walk — apply link below* 👇",
-    "✨ *One click away from your next role ↓*",
+    "*Apply here* 👇",
+    "*View & apply* 👇",
+    "*Interested? Apply below* 👇",
+    "*Tap to apply* 👇",
 ]
 
-COMPANY_DIVIDERS = [
-    "----------------------------------------",
-    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-    "════════════════════════════════════════",
-    "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓",
-    "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
-    "────────────────────────────────────────",
-    "╔════════════════════════════════════════╗",
-    "╭────────────────────────────────────────╮",
-    "★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★",
-    "✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦✦",
-    "◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆",
-    "▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒",
+# Short, clean separators only — no heavy grids or symbol spam
+LINES = [
+    "────────────────────────",
+    "━━━━━━━━━━━━━━━━━━━━━━━━",
+    "────────────────────────",
+    "━━━━━━━━━━━━━━━━━━━━━━━━",
 ]
-
-ROLE_DIVIDERS = [
-    "----------------------------------------",
-    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
-    "════════════════════════════════════════",
-    "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓",
-    "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
-    "────────────────────────────────────────",
-    "╚════════════════════════════════════════╝",
-    "╰────────────────────────────────────────╯",
-    "☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆",
-    "✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧✧",
-    "◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇",
-    "░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░",
-]
-
-COMPANY_PREFIX = ["🏢", "🔥", "⭐", "💼", "🌟", "🏆", "🔹", "✨"]
-ROLE_PREFIX = ["💼", "🎯", "⭐", "🔥", "✨", "🚀", "💫", "📌"]
-
-
-def _boxed(divider, middle_line):
-    return [divider, middle_line, divider]
-
-
-def _pick_idx(job, n, salt):
-    key = f"{job.get('title', '')}|{job.get('company', '')}|{salt}"
-    return int(hashlib.md5(key.encode()).hexdigest(), 16) % n
-
-
-def _pick_divider(job, pool, salt):
-    idx = _pick_idx(job, len(pool), salt)
-    return pool[idx]
 
 
 def _ist_hour():
@@ -159,7 +93,8 @@ def _pick(pool, job, salt=""):
 
 
 def _layout_idx(job):
-    return _pick_idx(job, 3, "layout")
+    key = f"{job.get('title', '')}|{job.get('company', '')}|layout"
+    return int(hashlib.md5(key.encode()).hexdigest(), 16) % 4
 
 
 def render_job_post(
@@ -177,50 +112,75 @@ def render_job_post(
     posted_today=False,
     salary="",
 ):
-    brand = BRANDS[brand_key]
     hook = _pick(HOOKS.get(_theme_slot(), HOOKS["default"]), job, "hook")
     cta = _pick(CTAS, job, "cta")
     layout = _layout_idx(job)
-    co_div = _pick_divider(job, COMPANY_DIVIDERS, "co_div")
-    role_div = _pick_divider(job, ROLE_DIVIDERS, "role_div")
-    if co_div == role_div:
-        role_div = ROLE_DIVIDERS[(_pick_idx(job, len(ROLE_DIVIDERS), "role_div") + 1) % len(ROLE_DIVIDERS)]
-    co_prefix = COMPANY_PREFIX[_pick_idx(job, len(COMPANY_PREFIX), "co_pre")]
-    role_prefix = ROLE_PREFIX[_pick_idx(job, len(ROLE_PREFIX), "role_pre")]
+    line = LINES[layout]
 
     co, ti, lo = escape(company), escape(title), escape(location)
     ex = escape(experience) if experience else ""
     ps = escape(posted_str) if posted_str else ""
 
-    company_box = _boxed(co_div, f"{co_prefix} Company name : *{co}*")
-    role_box = _boxed(role_div, f"{role_prefix} Role : *{ti}*")
-    loc_line = f"📍 Location : *{lo}*"
-
-    extras = []
+    meta = []
     if ex:
-        extras.append(f"👨‍💻 Experience : {ex}")
+        meta.append(f"Experience : {ex}")
     if ps:
-        extras.append(f"⏰ Posted : {ps}")
+        meta.append(f"Posted : {ps}")
     if salary and salary.lower() not in ("not mentioned", ""):
-        extras.append(f"💰 Salary : {escape(salary)}")
-    extra_block = "\n\n".join(extras) if extras else ""
+        meta.append(f"Salary : {escape(salary)}")
+    meta_line = "  ·  ".join(meta) if meta else ""
 
-    apply = f"\n\n{cta}\n\n🔗 {url}"
+    apply = f"\n{cta}\n{url}"
     if source:
-        apply += f"\n\n📋 _via {escape(source)}_"
+        apply += f"\n\n_via {escape(source)}_"
 
-    parts = [hook, ""]
-    if layout == 1:
-        parts.extend([f"{brand['icon']} {brand['spark']}", ""])
-    parts.extend(company_box)
-    if layout == 2:
-        parts.extend(["", f"📢 *{co}* is hiring!", ""])
+    if layout == 0:
+        # Card — single clean block
+        body = [
+            hook, "",
+            line,
+            f"Company : *{co}*",
+            f"Role       : *{ti}*",
+            f"Location : *{lo}*",
+        ]
+        if meta_line:
+            body.append(meta_line)
+        body.extend([line, apply])
+
+    elif layout == 1:
+        # Company first — bold & clear
+        body = [
+            hook, "",
+            f"🏢 *{co}*",
+            f"💼 *{ti}*",
+            f"📍 {lo}",
+        ]
+        if meta_line:
+            body.append(f"_{meta_line}_")
+        body.extend(["", apply])
+
+    elif layout == 2:
+        # Compact — good for mobile scan
+        body = [
+            hook, "",
+            line,
+            f"*Company*  ·  *{co}*",
+            f"*Role*         ·  *{ti}*",
+            f"*Location*  ·  *{lo}*",
+        ]
+        if meta_line:
+            body.append(f"_{meta_line}_")
+        body.extend([line, apply])
+
     else:
-        parts.append("")
-    parts.extend(role_box)
-    parts.extend(["", loc_line])
-    if extra_block:
-        parts.extend(["", extra_block])
-    parts.append(apply)
+        # Minimal — least visual noise
+        body = [
+            hook, "",
+            f"*{co}* — *{ti}*",
+            f"📍 {lo}",
+        ]
+        if meta_line:
+            body.append(f"_{meta_line}_")
+        body.extend(["", apply])
 
-    return "\n".join(x for x in parts if x is not None)
+    return "\n".join(body)
