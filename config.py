@@ -3,9 +3,12 @@ import os
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
 CHAT_ID   = os.environ.get("CHAT_ID", "")
 
-# LinkedIn search — Top 50 Tax Software Testing titles + combo searches
+# Naukri/Indeed — scan more keywords per cycle (LinkedIn uses full list)
+PORTAL_KEYWORD_LIMIT = 20
+
+# LinkedIn + Naukri search — Tax Software Testing titles & combos
 KEYWORDS = [
-    # Tax Software QA (1–10)
+    # Tax Software QA (1–15)
     "Tax Software QA Analyst",
     "US Tax Software QA Analyst",
     "Tax Software Tester",
@@ -16,17 +19,33 @@ KEYWORDS = [
     "US Tax QA Engineer",
     "Tax Quality Assurance Analyst",
     "Senior Tax Software QA Analyst",
-    # E-File / Schema (11–20)
+    "Tax Product QA Analyst",
+    "Tax Application QA Analyst",
+    "Tax Platform QA Engineer",
+    "Tax Software Validation Engineer",
+    "Tax Software Quality Analyst",
+    # E-File / ATS / Schema (16–35)
     "E-File Analyst",
     "E-File QA Analyst",
     "E-File Compliance Analyst",
     "E-File Specialist",
+    "E-File Testing Analyst",
     "XML Schema Analyst",
     "Tax Schema Analyst",
     "ATS Analyst",
     "Schema Validation Analyst",
     "Tax Schema Developer",
-    # Regulatory QA (21–30)
+    "XML Validation Analyst",
+    "XSD Schema Analyst",
+    "MeF Analyst",
+    "MeF QA Analyst",
+    "State E-File Analyst",
+    "Federal E-File Analyst",
+    "Print and Efile Analyst",
+    "Electronic Filing Analyst",
+    "DOR Approval Analyst",
+    "ATS Test Client Analyst",
+    # Regulatory / Compliance QA (36–50)
     "Regulatory QA Analyst Tax",
     "Regulatory QA Engineer Tax",
     "Tax Regulatory Analyst",
@@ -37,7 +56,12 @@ KEYWORDS = [
     "Tax Form Tester",
     "Tax Compliance Tester",
     "Regulatory Compliance QA Tax",
-    # Manual / Functional — Tax-prefixed (31–40)
+    "Tax Compliance Testing Analyst",
+    "IRS Compliance QA Analyst",
+    "State Tax QA Analyst",
+    "Filing Product QA Analyst",
+    "Compliance Testing Analyst Tax",
+    # Manual / Functional / UAT (51–65)
     "Tax Manual Test Engineer",
     "Tax Functional QA Analyst",
     "Tax Functional Test Analyst",
@@ -45,12 +69,16 @@ KEYWORDS = [
     "Tax UAT Analyst",
     "Tax Test Analyst",
     "Tax Software Test Analyst",
-    "Tax Software Tester",
     "Tax Test Engineer",
     "Tax QA Tester",
-    # Leadership — Tax-prefixed (41–50)
+    "Tax Integration Test Analyst",
+    "Tax End to End Test Analyst",
+    "Tax Smoke Test Analyst",
+    "Tax Sanity Test Analyst",
+    "Tax Validation Analyst",
+    "Tax Diagnostics Analyst",
+    # Leadership (66–75)
     "Tax QA Lead",
-    "Senior Tax QA Analyst",
     "Tax QA Manager",
     "Senior Tax Test Analyst",
     "Tax Test Lead",
@@ -59,8 +87,26 @@ KEYWORDS = [
     "Senior Tax QA Engineer",
     "Tax QA Consultant",
     "Tax Test Manager",
-    # LinkedIn combo searches
+    "Principal Tax QA Engineer",
+    # Product-specific QA (76–90)
+    "Lacerte QA Analyst",
+    "ProSeries QA Analyst",
+    "GoSystem QA Analyst",
+    "ONESOURCE QA Analyst",
+    "UltraTax QA Analyst",
+    "CCH Axcess QA Analyst",
+    "Drake Tax QA Analyst",
+    "ProSystem FX QA Analyst",
+    "TaxAct QA Analyst",
+    "ProConnect QA Analyst",
+    "Wolters Kluwer Tax QA",
+    "Thomson Reuters Tax QA",
+    "Vertex Tax QA Analyst",
+    "Avalara QA Analyst",
+    "Tax Software QA Hyderabad",
+    # Combo / broad searches (91–110)
     "Tax Software QA",
+    "Tax Software Testing",
     "E-File Analyst Tax",
     "XML Schema Tax",
     "GoSystem QA",
@@ -74,7 +120,11 @@ KEYWORDS = [
     "Tax Form QA",
     "Regulatory QA Tax",
     "Tax Compliance Testing",
-    "Tax Software Testing",
+    "US Tax QA Bangalore",
+    "Tax QA Chennai",
+    "E-File Testing India",
+    "Tax Schema QA",
+    "Print Compliance Tax QA",
 ]
 
 LOCATIONS = [

@@ -110,6 +110,14 @@ TESTING_KEYWORDS = [
     "tax test analyst", "tax software test analyst", "tax test engineer", "tax qa tester",
     "tax qa lead", "tax qa manager", "tax test lead", "tax qa engineer lead",
     "lead qa e-file analyst", "senior tax qa engineer", "tax qa consultant", "tax test manager",
+    # Expanded titles / products
+    "tax product qa", "tax application qa", "tax platform qa", "tax validation analyst",
+    "tax diagnostics analyst", "print and efile", "state e-file", "federal e-file",
+    "electronic filing", "dor approval", "ats test client", "xsd schema", "xml validation",
+    "mef qa", "mef analyst", "irs compliance qa", "filing product qa", "compliance testing tax",
+    "cch axcess", "ultratax", "drake tax", "prosystem fx", "proconnect", "vertex", "avalara",
+    "wolters kluwer", "thomson reuters", "tax integration test", "tax end to end",
+    "tax smoke test", "tax sanity test", "principal tax qa", "tax software validation",
 ]
 
 # Required signal — at least ONE must be present (not product names alone)
@@ -122,7 +130,7 @@ REQUIRED_TAX_SIGNAL = re.compile(
     r"1040|form\s*1040|"
     r"\bdor\b|department\s*of\s*revenue|"
     r"\bmef\b|modernized\s*e[\s-]*file|"
-    r"lacerte|proseries|gosystem|ultratax|onesource"
+    r"lacerte|proseries|gosystem|ultratax|onesource|cch\s*axcess|drake|proconnect|prosystem"
     r")\b",
     re.IGNORECASE,
 )
@@ -198,7 +206,11 @@ TESTING_ROLE_TITLE = re.compile(
     r"tax\s*(?:software|application|product)\s*(?:testing|tester|qa|validation)|"
     r"qa\s*(?:&|and)?\s*e[\s-]*file|e[\s-]*file\s*(?:&|and)?\s*qa|"
     r"schema\s*(?:validation|testing|analyst)|xml\s*(?:schema|testing|validation)|"
-    r"tax\s*(?:schema|xml|e[\s-]*file|ats|validation|diagnostics)|filing\s*product"
+    r"tax\s*(?:schema|xml|e[\s-]*file|ats|validation|diagnostics)|filing\s*product|"
+    r"tax\s*(?:product|application|platform)\s*qa|"
+    r"(?:lacerte|proseries|gosystem|ultratax|onesource|cch\s*axcess|drake)\s*qa|"
+    r"print\s*(?:and|&)\s*e[\s-]*file|state\s*e[\s-]*file|federal\s*e[\s-]*file|"
+    r"mef\s*(?:qa|analyst)?|tax\s*validation\s*analyst|tax\s*diagnostics\s*analyst"
     r")\b",
     re.IGNORECASE,
 )
