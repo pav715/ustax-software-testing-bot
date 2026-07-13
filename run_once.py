@@ -506,7 +506,7 @@ def extract_qualification(desc, title):
 
 def main():
     log("=" * 50)
-    log("US Tax Software Testing Bot — LinkedIn + Naukri + Indeed")
+    log("US Tax Software Testing Bot — LinkedIn Only")
     log("=" * 50)
 
     if not config.BOT_TOKEN or not config.CHAT_ID:

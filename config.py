@@ -3,10 +3,7 @@ import os
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
 CHAT_ID   = os.environ.get("CHAT_ID", "")
 
-# Naukri/Indeed — scan more keywords per cycle (LinkedIn uses full list)
-PORTAL_KEYWORD_LIMIT = 20
-
-# LinkedIn + Naukri search — Tax Software Testing titles & combos
+# LinkedIn search — Tax Software Testing titles & combos
 KEYWORDS = [
     # Tax Software QA (1–15)
     "Tax Software QA Analyst",

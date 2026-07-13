@@ -72,45 +72,35 @@ def _post(text, chat_id=None, retry=2):
 
 
 def _format_posted(posted, fetched_at=""):
-    """
-    Return a human-readable posted time string in IST.
-    - ISO date  "2026-03-08"           → "08 Mar 2026"
-    - ISO datetime "2026-03-08T10:30"  → "08 Mar 2026, 04:00 PM IST"  (converted to IST)
-    - Relative  "1 day ago"            → "1 day ago"
-    - Empty                            → use fetched_at converted to IST
-    """
+    """Date only — no time."""
     IST_OFFSET = timedelta(hours=5, minutes=30)
-
     p = str(posted or "").strip()
 
-    # Try ISO date/datetime format
     if p and re.match(r"\d{4}-\d{2}-\d{2}", p):
         try:
-            dt = datetime.fromisoformat(p[:19])  # handles "2026-03-08" and "2026-03-08T10:30:00"
+            dt = datetime.fromisoformat(p[:19])
             if len(p) >= 16:
-                # Has time component — convert UTC → IST
-                dt_ist = dt + IST_OFFSET
-                return dt_ist.strftime("%d %b %Y, %I:%M %p IST")
-            else:
-                # Date only
-                return dt.strftime("%d %b %Y")
+                dt = dt + IST_OFFSET
+            return dt.strftime("%d %b %Y")
         except Exception:
             pass
 
-    # Relative string from Indeed / Naukri / Workday — return as-is
-    if p:
+    if p and re.search(r"\d{1,2}\s+\w+\s+\d{4}", p):
+        m = re.search(r"(\d{1,2}\s+\w+\s+\d{4})", p)
+        if m:
+            return m.group(1)
+
+    if p and not re.search(r"\d:\d{2}", p):
         return p
 
-    # Fallback: use fetched_at (when bot scraped it), convert UTC → IST
     if fetched_at:
         try:
             dt = datetime.fromisoformat(str(fetched_at)[:19])
-            dt_ist = dt + IST_OFFSET
-            return f"Found at {dt_ist.strftime('%d %b %Y, %I:%M %p IST')}"
+            return (dt + IST_OFFSET).strftime("%d %b %Y")
         except Exception:
             pass
 
-    return ""
+    return date.today().strftime("%d %b %Y")
 
 
 def _urgency_tag(posted):
@@ -137,14 +127,68 @@ def _qualification(title):
         return "Graduate / Post-Graduate (Accounting / Finance preferred)"
 
 
+_CITY_STATE = {
+    "hyderabad": ("Hyderabad", "Telangana"),
+    "secunderabad": ("Hyderabad", "Telangana"),
+    "bangalore": ("Bangalore", "Karnataka"),
+    "bengaluru": ("Bangalore", "Karnataka"),
+    "chennai": ("Chennai", "Tamil Nadu"),
+    "mumbai": ("Mumbai", "Maharashtra"),
+    "navi mumbai": ("Mumbai", "Maharashtra"),
+    "pune": ("Pune", "Maharashtra"),
+    "delhi": ("Delhi", "Delhi"),
+    "new delhi": ("Delhi", "Delhi"),
+    "noida": ("Noida", "Uttar Pradesh"),
+    "gurgaon": ("Gurgaon", "Haryana"),
+    "gurugram": ("Gurugram", "Haryana"),
+    "kolkata": ("Kolkata", "West Bengal"),
+    "ahmedabad": ("Ahmedabad", "Gujarat"),
+    "kochi": ("Kochi", "Kerala"),
+    "cochin": ("Kochi", "Kerala"),
+    "visakhapatnam": ("Visakhapatnam", "Andhra Pradesh"),
+    "vizag": ("Visakhapatnam", "Andhra Pradesh"),
+    "jaipur": ("Jaipur", "Rajasthan"),
+    "indore": ("Indore", "Madhya Pradesh"),
+    "chandigarh": ("Chandigarh", "Chandigarh"),
+    "coimbatore": ("Coimbatore", "Tamil Nadu"),
+    "lucknow": ("Lucknow", "Uttar Pradesh"),
+}
+
+_BAD = ("metropolitan", "anywhere", "all areas", "preferred", "west india", "south india")
+
+
 def _format_location(loc):
-    loc = (loc or "India").strip()
+    """City, State — clean short format."""
+    loc = (loc or "").strip()
+    if not loc:
+        return "India"
     ll = loc.lower()
-    if "remote" in ll and "(remote)" not in ll and "· remote" not in ll:
-        return loc
-    if "hyderabad" in ll and "hybrid" not in ll and "· hybrid" not in ll:
-        return f"{loc} · Hybrid"
-    return loc
+    if "remote" in ll:
+        return "Remote"
+
+    parts = [p.strip() for p in loc.split(",") if p.strip()]
+    if len(parts) >= 2:
+        city, state = parts[0], parts[1]
+        if state.lower() not in ("india", "in") and len(city) <= 30 and len(state) <= 35:
+            if not any(x in city.lower() or x in state.lower() for x in _BAD):
+                return f"{city}, {state}"
+
+    for key, (city, state) in sorted(_CITY_STATE.items(), key=lambda x: -len(x[0])):
+        if key in ll:
+            return f"{city}, {state}"
+
+    for city in getattr(config, "LOCATIONS", []):
+        cl = city.lower()
+        if cl in ll:
+            for key, (c, s) in _CITY_STATE.items():
+                if key == cl or c.lower() == cl:
+                    return f"{c}, {s}"
+            return city
+
+    first = parts[0] if parts else ""
+    if first and len(first) <= 25 and not any(x in first.lower() for x in _BAD):
+        return first.title()
+    return "India"
 
 
 def _experience_display(job, title):
