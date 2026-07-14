@@ -59,18 +59,21 @@ def _linkedin_scan_set():
     return kws, locs
 
 
-def _make_job(title, company, location, url, posted=""):
+def _make_job(title, company, location, url, posted="", search_keyword="", search_location=""):
+    loc = location or search_location or ""
     return {
         "id": _job_id(url, title, company),
         "title": title,
         "company": company,
-        "location": location,
+        "location": loc,
         "url": url,
         "posted": posted,
         "experience": "",
         "skills": "",
         "description": "",
         "source": "LinkedIn",
+        "search_keyword": search_keyword,
+        "search_location": search_location or loc,
         "fetched_at": datetime.now().isoformat(),
     }
 
@@ -107,7 +110,8 @@ def scrape_linkedin(keyword, location, since_seconds=86400):
                 link = a_tag["href"].split("?")[0] if a_tag else ""
                 posted = t_tag.get("datetime", "") if t_tag else ""
                 if title and link:
-                    jobs.append(_make_job(title, company, loc_str, link, posted))
+                    jobs.append(_make_job(title, company, loc_str, link, posted,
+                                          search_keyword=keyword, search_location=location))
             except Exception:
                 pass
     except Exception as e:

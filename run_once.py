@@ -240,8 +240,10 @@ def _keyword_hits(text, keywords):
 
 
 def is_india_location(job):
-    loc = (job.get("location") or "").lower()
+    loc = (job.get("location") or job.get("search_location") or "").lower()
     title = (job.get("title") or "").lower()
+    if not loc.strip():
+        return True
 
     if any(kw in loc for kw in FOREIGN_LOCATION_KEYWORDS):
         return False
@@ -275,6 +277,17 @@ def _has_required_tax_signal(text):
     return bool(REQUIRED_TAX_SIGNAL.search(text))
 
 
+def _title_matches_search(title, keyword):
+    if not title or not keyword:
+        return False
+    tl = title.lower()
+    words = [w for w in re.findall(r"[a-z]+", keyword.lower()) if len(w) > 3]
+    if not words:
+        return False
+    hits = sum(1 for w in words if w in tl)
+    return hits >= max(1, (len(words) + 1) // 2)
+
+
 def is_tax_software_testing_job(job):
     """Accept only when tax software / ATS / e-file / XML / 1040 / DOR signal present."""
     desc = (job.get("description") or "").lower()
@@ -284,6 +297,14 @@ def is_tax_software_testing_job(job):
 
     if INDIAN_TAX_BLOCKLIST.search(title) or INDIAN_TAX_BLOCKLIST.search(company):
         return False
+
+    sk = (job.get("search_keyword") or "")
+    if sk and "tax" in sk.lower() and re.search(r"\btax\b", title):
+        if re.search(r"\b(test|qa|quality|software|automation|analyst|associate)\b", blob):
+            if not BLOCKLIST.search(title) and not INDIAN_TAX_BLOCKLIST.search(blob):
+                if _title_matches_search(title, sk) or TESTING_ROLE_TITLE.search(title):
+                    print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: search keyword + tax testing")
+                    return True
 
     if GENERIC_IT_BLOCKLIST.search(blob) and not _has_required_tax_signal(blob):
         return False
