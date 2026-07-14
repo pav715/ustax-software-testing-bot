@@ -31,6 +31,34 @@ def _delay():
     time.sleep(random.uniform(0.6, 1.2))
 
 
+def _ist_hour():
+    try:
+        from zoneinfo import ZoneInfo
+        return datetime.now(ZoneInfo("Asia/Kolkata")).hour
+    except Exception:
+        return datetime.utcnow().hour
+
+
+def _rotated_slice(items, limit, hour=None):
+    if not items or limit <= 0 or len(items) <= limit:
+        return list(items)
+    if hour is None:
+        hour = _ist_hour()
+    start = (hour * limit) % len(items)
+    chunk = items[start : start + limit]
+    if len(chunk) < limit:
+        chunk += items[: limit - len(chunk)]
+    return chunk
+
+
+def _linkedin_scan_set():
+    kw_limit = getattr(config, "LINKEDIN_KEYWORD_LIMIT", 30)
+    loc_limit = getattr(config, "LINKEDIN_LOCATION_LIMIT", 6)
+    kws = _rotated_slice(config.KEYWORDS, kw_limit)
+    locs = config.LOCATIONS[:loc_limit]
+    return kws, locs
+
+
 def _make_job(title, company, location, url, posted=""):
     return {
         "id": _job_id(url, title, company),
@@ -93,8 +121,10 @@ def fetch_all_jobs(since_seconds=86400):
     seen = set()
 
     print(f"\n[LinkedIn] Scanning (last {since_seconds // 3600}h)...")
-    for kw in config.KEYWORDS:
-        for loc in config.LOCATIONS:
+    linkedin_kws, linkedin_locs = _linkedin_scan_set()
+    print(f"  Batch: {len(linkedin_kws)} keywords × {len(linkedin_locs)} cities (IST hour {_ist_hour()})")
+    for kw in linkedin_kws:
+        for loc in linkedin_locs:
             for job in scrape_linkedin(kw, loc, since_seconds):
                 key = job.get("url") or job.get("id")
                 if key and key not in seen:
