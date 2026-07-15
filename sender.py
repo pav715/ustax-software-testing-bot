@@ -45,7 +45,8 @@ def _post(text, chat_id=None, retry=2):
                 )
                 if r.status_code == 200:
                     return True
-                elif attempt < retry - 1:
+                print(f"[Telegram] HTTP {r.status_code}: {r.text[:200]}")
+                if attempt < retry - 1:
                     time.sleep(1)
                     continue
             except requests.Timeout:

@@ -270,6 +270,8 @@ def _passes_early_filter(job, role_title_pattern):
         return False
     if re.search(r"\btax\b", title_l) and re.search(r"\b(test|qa|quality|software|automation|analyst|associate)\b", title_l):
         return True
+    if sk and "tax" in sk.lower() and _title_matches_search(title, sk):
+        return True
     if sk and _title_matches_search(title, sk):
         return True
     if role_title_pattern.search(title_l) and re.search(r"\btax\b", title_l):
@@ -307,6 +309,17 @@ def is_tax_software_testing_job(job):
 
     if INDIAN_TAX_BLOCKLIST.search(title) or INDIAN_TAX_BLOCKLIST.search(company):
         return False
+
+    sk_l = (job.get("search_keyword") or "").lower()
+    # Title + search intent — pass without description (LinkedIn enrich often rate-limited)
+    if re.search(r"\btax\b", title) and (
+        TESTING_ROLE_TITLE.search(title)
+        or re.search(r"\b(qa|test|testing|software|e[\s-]?file|ats|xml|schema|validation|analyst|associate)\b", title)
+        or (sk_l and ("tax" in sk_l or "qa" in sk_l or "test" in sk_l) and _title_matches_search(title, job.get("search_keyword") or ""))
+    ):
+        if not BLOCKLIST.search(title) and not BLOCKLIST.search(company):
+            print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: tax testing title")
+            return True
 
     sk = (job.get("search_keyword") or "")
     if sk and "tax" in sk.lower() and re.search(r"\btax\b", title):
@@ -585,12 +598,22 @@ def main():
     log(f"India jobs: {len(india_jobs)} out of {len(jobs)} total.")
 
     tax_software_testing_jobs = []
+    enrich_budget = getattr(config, "MAX_ENRICH_PER_CYCLE", 30)
+    enriched = 0
     for job in india_jobs:
         if not _passes_early_filter(job, TESTING_ROLE_TITLE):
             continue
-        job = enrich_job(job)
         if is_tax_software_testing_job(job):
             tax_software_testing_jobs.append(job)
+            continue
+        if enriched >= enrich_budget:
+            continue
+        job = enrich_job(job)
+        enriched += 1
+        if is_tax_software_testing_job(job):
+            tax_software_testing_jobs.append(job)
+
+    log(f"Enriched {enriched} jobs (budget {enrich_budget})")
 
     log(f"Tax Software Testing relevant: {len(tax_software_testing_jobs)} out of {len(india_jobs)} India jobs.")
 
