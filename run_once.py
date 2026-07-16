@@ -258,6 +258,30 @@ def is_india_location(job):
     return False
 
 
+_SEARCH_TESTING_INTENT = re.compile(
+    r"\b(tax|qa|test|quality|software|e[\s-]?file|efile|schema|ats|validation|mef|regulatory|compliance)\b",
+    re.IGNORECASE,
+)
+
+
+def _passes_search_trust(job):
+    """Trust LinkedIn niche keyword search — title may not repeat full query."""
+    sk_l = (job.get("search_keyword") or "").lower()
+    title = (job.get("title") or "").lower()
+    if not sk_l or not _SEARCH_TESTING_INTENT.search(sk_l):
+        return False
+    if INDIAN_TAX_BLOCKLIST.search(title) or BLOCKLIST.search(title):
+        return False
+    if re.search(r"\btax\b", title):
+        return True
+    if re.search(r"\b(qa|test|quality|software|validation|analyst|engineer|tester|associate|specialist)\b", title):
+        if re.search(r"\b(tax|qa|test|quality|software|e[\s-]?file|schema|ats|validation|mef)\b", sk_l):
+            return True
+    if TESTING_ROLE_TITLE.search(title):
+        return True
+    return False
+
+
 def _passes_early_filter(job, role_title_pattern):
     title = job.get("title") or ""
     company = job.get("company") or ""
@@ -268,6 +292,8 @@ def _passes_early_filter(job, role_title_pattern):
         return False
     if BLOCKLIST.search(title_l) or BLOCKLIST.search(company_l):
         return False
+    if _passes_search_trust(job):
+        return True
     if re.search(r"\btax\b", title_l) and re.search(r"\b(test|qa|quality|software|automation|analyst|associate)\b", title_l):
         return True
     if sk and "tax" in sk.lower() and _title_matches_search(title, sk):
@@ -309,6 +335,10 @@ def is_tax_software_testing_job(job):
 
     if INDIAN_TAX_BLOCKLIST.search(title) or INDIAN_TAX_BLOCKLIST.search(company):
         return False
+
+    if _passes_search_trust(job):
+        print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: search keyword trust")
+        return True
 
     sk_l = (job.get("search_keyword") or "").lower()
     # Title + search intent — pass without description (LinkedIn enrich often rate-limited)

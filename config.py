@@ -141,7 +141,26 @@ LOCATIONS = [
 
 MAX_JOBS_PER_CYCLE = 15
 LINKEDIN_KEYWORD_LIMIT = 40
-LINKEDIN_LOCATION_LIMIT = 6
+LINKEDIN_LOCATION_LIMIT = 10
 SCRAPE_WINDOW_SECONDS = 86400
-MAX_ENRICH_PER_CYCLE = 30
+MAX_ENRICH_PER_CYCLE = 50
 CHECK_INTERVAL_LABEL = "1 hour"
+
+# Always scanned every hour (not rotated out)
+PRIORITY_KEYWORDS = [
+    "Tax Software QA Analyst",
+    "US Tax Software QA Analyst",
+    "Tax Software Tester",
+    "Tax QA Engineer",
+    "Senior Tax QA Analyst",
+    "Tax Software Quality Engineer",
+    "E-File QA Analyst",
+    "E-File Analyst",
+    "Tax Schema Analyst",
+    "ATS Analyst",
+    "Tax Compliance QA Analyst",
+    "Tax Manual Test Engineer",
+    "Tax Functional QA Analyst",
+    "Tax Test Engineer",
+    "Tax QA Lead",
+]
