@@ -691,7 +691,7 @@ def main():
         save_seen(seen)
         save_stats(stats)
         _mark_run_complete(state)
-        _write_cycle_report(len(jobs), len(india_jobs), len(tax_software_testing_jobs), 0, 0, len(seen), telegram_ok=tg_ok)
+        _write_cycle_report(len(jobs), len(india_jobs), len(tax_software_testing_jobs), 0, 0, len(seen), telegram_ok=tg_ok, telegram_detail=tg_msg)
         return
 
     if len(new_jobs) > config.MAX_JOBS_PER_CYCLE:
@@ -724,7 +724,7 @@ def main():
     save_seen(seen)
     save_stats(stats)
     _mark_run_complete(state)
-    _write_cycle_report(len(jobs), len(india_jobs), len(tax_software_testing_jobs), len(new_jobs), sent, len(seen), telegram_ok=tg_ok)
+    _write_cycle_report(len(jobs), len(india_jobs), len(tax_software_testing_jobs), len(new_jobs), sent, len(seen), telegram_ok=tg_ok, telegram_detail=tg_msg)
     log(f"Done. Sent {sent} new jobs. Today total: {stats['sent']}. Tracked: {len(seen)}")
 
 
