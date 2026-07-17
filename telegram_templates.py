@@ -109,7 +109,7 @@ def render_job_post(
         "",
         divider,
         "",
-        f"🏢 *Company:* 🔥 *{co}* 🔥",
+        f"🏢 *Company:* *{co}*",
         "",
         f"💼 *Role:* *{ti}*",
         "",

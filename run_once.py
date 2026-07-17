@@ -251,6 +251,48 @@ FOREIGN_LOCATION_KEYWORDS = [
     "dubai", "germany", "france",
 ]
 
+US_STATE_LOCATION = re.compile(
+    r"\b("
+    r"alabama|alaska|arizona|arkansas|california|colorado|connecticut|delaware|florida|georgia|"
+    r"hawaii|idaho|illinois|indiana|iowa|kansas|kentucky|louisiana|maine|maryland|massachusetts|"
+    r"michigan|minnesota|mississippi|missouri|montana|nebraska|nevada|new\s*hampshire|new\s*jersey|"
+    r"new\s*mexico|new\s*york|north\s*carolina|north\s*dakota|ohio|oklahoma|oregon|pennsylvania|"
+    r"rhode\s*island|south\s*carolina|south\s*dakota|tennessee|texas|utah|vermont|virginia|"
+    r"washington|west\s*virginia|wisconsin|wyoming|"
+    r"AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|"
+    r"NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY"
+    r")\b",
+    re.IGNORECASE,
+)
+
+_TAX_TESTING_SIGNALS = re.compile(
+    r"\b(tax|qa|test|quality|software|e[\s-]?file|schema|ats|validation|analyst|testing)\b",
+    re.IGNORECASE,
+)
+
+
+def _is_us_location(job):
+    """Reject US state / USA jobs (common on software channel from broad LinkedIn results)."""
+    loc = (job.get("location") or "").lower()
+    if not loc.strip():
+        return False
+    if any(kw in loc for kw in FOREIGN_LOCATION_KEYWORDS):
+        if not any(kw in loc for kw in INDIA_LOCATION_KEYWORDS):
+            return True
+    if US_STATE_LOCATION.search(loc):
+        if not any(kw in loc for kw in INDIA_LOCATION_KEYWORDS):
+            return True
+    return False
+
+
+def _has_mandatory_tax_and_signals(blob):
+    """Tax mandatory + at least 3 tax/testing keyword signals in title/company/description."""
+    if not re.search(r"\btax\b", blob, re.IGNORECASE):
+        return False
+    signals = set(_TAX_TESTING_SIGNALS.findall(blob.lower()))
+    signals.add("tax")
+    return len(signals) >= 3
+
 
 def _keyword_hits(text, keywords):
     hits = []
@@ -265,12 +307,17 @@ def _keyword_hits(text, keywords):
 
 def is_india_location(job):
     """Return True for India on-site, India-tied remote, or India-targeted search results."""
+    if _is_us_location(job):
+        return False
+
     loc = (job.get("location") or "").lower()
     search_loc = (job.get("search_location") or "").lower()
     title = (job.get("title") or "").lower()
 
-    # GitHub Actions (US IP): LinkedIn often returns foreign loc for India city searches — trust search_loc
+    # GitHub Actions (US IP): trust India city search only when job loc is not explicitly US
     if search_loc and any(kw in search_loc for kw in INDIA_LOCATION_KEYWORDS):
+        if loc and _is_us_location({"location": loc}):
+            return False
         return True
 
     if not loc.strip():
@@ -296,21 +343,16 @@ _SEARCH_TESTING_INTENT = re.compile(
 
 
 def _passes_search_trust(job):
-    """Trust LinkedIn niche keyword search — title may not repeat full query."""
+    """Trust LinkedIn tax/QA search only when title+company show tax + 2 other signals."""
     sk_l = (job.get("search_keyword") or "").lower()
     title = (job.get("title") or "").lower()
-    if not sk_l or not _SEARCH_TESTING_INTENT.search(sk_l):
+    company = (job.get("company") or "").lower()
+    blob = f"{title} {company}"
+    if not sk_l or "tax" not in sk_l:
         return False
     if INDIAN_TAX_BLOCKLIST.search(title) or BLOCKLIST.search(title):
         return False
-    if re.search(r"\btax\b", title):
-        return True
-    if re.search(r"\b(qa|test|quality|software|validation|analyst|engineer|tester|associate|specialist)\b", title):
-        if re.search(r"\b(tax|qa|test|quality|software|e[\s-]?file|schema|ats|validation|mef)\b", sk_l):
-            return True
-    if TESTING_ROLE_TITLE.search(title):
-        return True
-    return False
+    return _has_mandatory_tax_and_signals(blob)
 
 
 def _passes_early_filter(job, role_title_pattern):
@@ -319,19 +361,23 @@ def _passes_early_filter(job, role_title_pattern):
     sk = job.get("search_keyword") or ""
     title_l = title.lower()
     company_l = company.lower()
+    blob = f"{title_l} {company_l}"
     if INDIAN_TAX_BLOCKLIST.search(title_l) or INDIAN_TAX_BLOCKLIST.search(company_l):
         return False
     if BLOCKLIST.search(title_l) or BLOCKLIST.search(company_l):
         return False
-    if _passes_search_trust(job):
-        return True
-    if re.search(r"\btax\b", title_l) and re.search(r"\b(test|qa|quality|software|automation|analyst|associate)\b", title_l):
-        return True
+    if not re.search(r"\btax\b", blob):
+        return False
+    if not _has_mandatory_tax_and_signals(blob):
+        return False
     if sk and "tax" in sk.lower() and _title_matches_search(title, sk):
         return True
-    if sk and _title_matches_search(title, sk):
-        return True
     if role_title_pattern.search(title_l) and re.search(r"\btax\b", title_l):
+        return True
+    if re.search(r"\btax\b", title_l) and re.search(
+        r"\b(test|qa|quality|software|automation|analyst|associate|validation|e[\s-]?file|schema|ats)\b",
+        title_l,
+    ):
         return True
     return False
 
@@ -358,7 +404,7 @@ def _title_matches_search(title, keyword):
 
 
 def is_tax_software_testing_job(job):
-    """Accept only when tax software / ATS / e-file / XML / 1040 / DOR signal present."""
+    """Tax mandatory + 3 tax/testing signals; no generic QA/US-only roles."""
     desc = (job.get("description") or "").lower()
     title = (job.get("title") or "").lower()
     company = (job.get("company") or "").lower()
@@ -366,57 +412,26 @@ def is_tax_software_testing_job(job):
 
     if INDIAN_TAX_BLOCKLIST.search(title) or INDIAN_TAX_BLOCKLIST.search(company):
         return False
+    if BLOCKLIST.search(title) or BLOCKLIST.search(company):
+        return False
+    if not _has_mandatory_tax_and_signals(blob):
+        return False
 
     if _passes_search_trust(job):
-        print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: search keyword trust")
+        print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: tax search keyword trust")
         return True
 
-    sk_l = (job.get("search_keyword") or "").lower()
-    # Title + search intent — pass without description (LinkedIn enrich often rate-limited)
-    if re.search(r"\btax\b", title) and (
-        TESTING_ROLE_TITLE.search(title)
-        or re.search(r"\b(qa|test|testing|software|e[\s-]?file|ats|xml|schema|validation|analyst|associate)\b", title)
-        or (sk_l and ("tax" in sk_l or "qa" in sk_l or "test" in sk_l) and _title_matches_search(title, job.get("search_keyword") or ""))
-    ):
-        if not BLOCKLIST.search(title) and not BLOCKLIST.search(company):
-            print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: tax testing title")
-            return True
-
-    sk = (job.get("search_keyword") or "")
-    if sk and "tax" in sk.lower() and re.search(r"\btax\b", title):
-        if re.search(r"\b(test|qa|quality|software|automation|analyst|associate)\b", blob):
-            if not BLOCKLIST.search(title) and not INDIAN_TAX_BLOCKLIST.search(blob):
-                if _title_matches_search(title, sk) or TESTING_ROLE_TITLE.search(title):
-                    print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: search keyword + tax testing")
-                    return True
+    if TESTING_ROLE_TITLE.search(title) and re.search(r"\btax\b", title):
+        print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: tax testing title")
+        return True
 
     if GENERIC_IT_BLOCKLIST.search(blob) and not _has_required_tax_signal(blob):
         return False
-
-    if TESTING_ROLE_TITLE.search(title):
-        if BLOCKLIST.search(title) or BLOCKLIST.search(company):
-            return False
-        if _is_generic_qa_title(title) and not _has_required_tax_signal(blob):
-            return False
-        if re.search(r"\btax\b", title) or _has_required_tax_signal(blob):
-            print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: tax software testing title")
-            return True
-        return False
-
-    if BLOCKLIST.search(blob):
-        return False
-    if INDIAN_TAX_BLOCKLIST.search(blob):
-        return False
-    if _is_generic_qa_title(title) and not _has_required_tax_signal(blob):
-        return False
-    if GENERIC_IT_BLOCKLIST.search(blob) and not _has_required_tax_signal(blob):
-        return False
-
-    if not _has_required_tax_signal(blob):
+    if _is_generic_qa_title(title) and not re.search(r"\btax\b", title):
         return False
 
     matched = _keyword_hits(blob, TESTING_KEYWORDS)
-    if matched and TESTING_SIGNAL.search(blob):
+    if len(matched) >= 2 and TESTING_SIGNAL.search(blob) and re.search(r"\btax\b", blob):
         print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: {matched}")
         return True
     return False

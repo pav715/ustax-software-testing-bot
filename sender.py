@@ -241,10 +241,10 @@ def format_job(job):
 
 def send_job(job):
     msg = format_job(job)
-    plain = re.sub(r"[*_`\[\]]", "", msg)
-    ok = _post(plain)
-    if not ok and plain != msg:
-        ok = _post(msg)
+    ok = _post(msg)
+    if not ok:
+        plain = re.sub(r"[*_`\[\]]", "", msg)
+        ok = _post(plain)
     if ok:
         time.sleep(2)
     return ok
