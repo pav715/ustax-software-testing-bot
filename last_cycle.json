@@ -1,11 +1,11 @@
 {
-  "scraped": 480,
-  "india": 480,
-  "matched": 348,
-  "new": 15,
-  "sent": 15,
+  "scraped": 416,
+  "india": 395,
+  "matched": 1,
+  "new": 0,
+  "sent": 0,
   "seen_total": 30,
   "telegram_ok": true,
   "telegram_detail": "getMe=200 getChat=200 {\"ok\":true,\"result\":{\"id\":-1004378631673,\"title\":\"US Tax Software Testing Jobs \\",
-  "at": "2026-07-17T07:41:51.142369"
+  "at": "2026-07-17T08:41:46.689188"
 }
