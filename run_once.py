@@ -285,13 +285,13 @@ def _is_us_location(job):
     return False
 
 
-def _has_mandatory_tax_and_signals(blob):
-    """Tax mandatory + at least 3 tax/testing keyword signals in title/company/description."""
+def _has_mandatory_tax_and_signals(blob, min_signals=2):
+    """Tax mandatory + at least min_signals tax/testing keyword signals."""
     if not re.search(r"\btax\b", blob, re.IGNORECASE):
         return False
     signals = set(_TAX_TESTING_SIGNALS.findall(blob.lower()))
     signals.add("tax")
-    return len(signals) >= 3
+    return len(signals) >= min_signals
 
 
 def _keyword_hits(text, keywords):
@@ -363,8 +363,6 @@ def _passes_early_filter(job, role_title_pattern):
         return False
     if not re.search(r"\btax\b", blob):
         return False
-    if not _has_mandatory_tax_and_signals(blob):
-        return False
     if sk and "tax" in sk.lower() and _title_matches_search(title, sk):
         return True
     if role_title_pattern.search(title_l) and re.search(r"\btax\b", title_l):
@@ -426,7 +424,7 @@ def is_tax_software_testing_job(job):
         return False
 
     matched = _keyword_hits(blob, TESTING_KEYWORDS)
-    if len(matched) >= 2 and TESTING_SIGNAL.search(blob) and re.search(r"\btax\b", blob):
+    if len(matched) >= 1 and TESTING_SIGNAL.search(blob) and re.search(r"\btax\b", blob):
         print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: {matched}")
         return True
     return False
