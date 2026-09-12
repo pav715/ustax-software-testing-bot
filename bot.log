@@ -1,0 +1,157 @@
+[2026-03-07 21:50:03] ============================================================
+[2026-03-07 21:50:03]   US Tax Jobs Telegram Bot
+[2026-03-07 21:50:03]   Bot: @USTaxjobs_bot
+[2026-03-07 21:50:03]   Check interval: every 10 minutes
+[2026-03-07 21:50:03] ============================================================
+[2026-03-07 21:50:03] CHAT_ID not set. Detecting from Telegram updates...
+[2026-03-07 21:50:08] No channel found. Add @USTaxjobs_bot as Admin to your channel, send a message, then restart.
+[2026-03-07 21:50:08] Cannot start without CHAT_ID. Exiting.
+[2026-03-07 21:51:28] ============================================================
+[2026-03-07 21:51:28]   US Tax Jobs Telegram Bot
+[2026-03-07 21:51:28]   Bot: @USTaxjobs_bot
+[2026-03-07 21:51:28]   Check interval: every 10 minutes
+[2026-03-07 21:51:28] ============================================================
+[2026-03-07 21:51:28] CHAT_ID not set. Detecting from Telegram updates...
+[2026-03-07 21:51:29] Chat ID detected and saved: -1003570586532  (US Tax Jobs information 🇺🇸💼💻👨‍💻👩‍💻)
+[2026-03-07 21:51:29] Loaded 0 previously seen jobs (no duplicates).
+[2026-03-07 21:51:31] Checking for new jobs... (37 keywords x 7 locations)
+[2026-03-07 22:05:52] ============================================================
+[2026-03-07 22:05:52]   US Tax Jobs Telegram Bot
+[2026-03-07 22:05:52]   Bot: @USTaxjobs_bot
+[2026-03-07 22:05:52]   Check interval: every 10 minutes
+[2026-03-07 22:05:52] ============================================================
+[2026-03-07 22:05:52] Loaded 0 previously seen jobs (no duplicates).
+[2026-03-07 22:05:52] First run detected: preloading existing jobs as already seen (no backlog will be sent).
+[2026-03-07 22:12:09] ============================================================
+[2026-03-07 22:12:09]   US Tax Jobs Telegram Bot
+[2026-03-07 22:12:09]   Bot: @USTaxjobs_bot
+[2026-03-07 22:12:09]   Check interval: every 10 minutes
+[2026-03-07 22:12:09] ============================================================
+[2026-03-07 22:12:09] Loaded 0 previously seen jobs (no duplicates).
+[2026-03-07 22:12:11] Checking for new jobs... (37 keywords x 7 locations)
+[2026-03-07 22:26:47] ============================================================
+[2026-03-07 22:26:47]   US Tax Jobs Telegram Bot
+[2026-03-07 22:26:47]   Bot: @USTaxjobs_bot
+[2026-03-07 22:26:47]   Check interval: every 10 minutes
+[2026-03-07 22:26:47] ============================================================
+[2026-03-07 22:26:47] Loaded 0 previously seen jobs (no duplicates).
+[2026-03-07 22:26:48] Checking for new jobs... (37 keywords x 7 locations)
+[2026-03-07 22:29:49] ============================================================
+[2026-03-07 22:29:49]   US Tax Jobs Telegram Bot
+[2026-03-07 22:29:49]   Bot: @USTaxjobs_bot
+[2026-03-07 22:29:49]   Check interval: every 10 minutes
+[2026-03-07 22:29:49] ============================================================
+[2026-03-07 22:29:49] Loaded 0 previously seen jobs (no duplicates).
+[2026-03-07 22:29:51] Checking for new jobs... (37 keywords x 7 locations)
+[2026-03-07 22:32:33] ============================================================
+[2026-03-07 22:32:33]   US Tax Jobs Telegram Bot
+[2026-03-07 22:32:33]   Bot: @USTaxjobs_bot
+[2026-03-07 22:32:33]   Check interval: every 1 minutes
+[2026-03-07 22:32:33] ============================================================
+[2026-03-07 22:32:33] Loaded 0 previously seen jobs (no duplicates).
+[2026-03-07 22:32:34] Checking for new jobs... (37 keywords x 7 locations)
+[2026-03-07 22:34:41] ============================================================
+[2026-03-07 22:34:41]   US Tax Jobs Telegram Bot
+[2026-03-07 22:34:41]   Bot: @USTaxjobs_bot
+[2026-03-07 22:34:41]   Check interval: every 1 minutes
+[2026-03-07 22:34:41] ============================================================
+[2026-03-07 22:34:41] Loaded 0 previously seen jobs (no duplicates).
+[2026-03-07 22:34:41] Checking for new jobs... (37 keywords x 7 locations)
+[2026-03-07 22:36:12] ============================================================
+[2026-03-07 22:36:12]   US Tax Jobs Telegram Bot
+[2026-03-07 22:36:12]   Bot: @USTaxjobs_bot
+[2026-03-07 22:36:12]   Check interval: every 1 minutes
+[2026-03-07 22:36:12] ============================================================
+[2026-03-07 22:36:12] Loaded 0 previously seen jobs (no duplicates).
+[2026-03-07 22:36:12] Checking for new jobs... (37 keywords x 7 locations)
+[2026-03-07 22:39:36] ============================================================
+[2026-03-07 22:39:36]   US Tax Jobs Telegram Bot
+[2026-03-07 22:39:36]   Bot: @USTaxjobs_bot
+[2026-03-07 22:39:36]   Check interval: every 1 minutes
+[2026-03-07 22:39:36] ============================================================
+[2026-03-07 22:39:36] Loaded 0 previously seen jobs (no duplicates).
+[2026-03-07 22:39:36] Checking for new jobs... (37 keywords x 7 locations)
+[2026-03-07 22:42:19] Manual trigger: send_last_week_jobs()
+[2026-03-07 22:44:10] ============================================================
+[2026-03-07 22:44:10]   US Tax Jobs Telegram Bot
+[2026-03-07 22:44:10]   Bot: @USTaxjobs_bot
+[2026-03-07 22:44:10]   Check interval: every 1 minutes
+[2026-03-07 22:44:10] ============================================================
+[2026-03-07 22:44:10] Loaded 0 previously seen jobs (no duplicates).
+[2026-03-07 22:44:10] Checking for new jobs... (37 keywords x 7 locations)
+[2026-03-07 22:46:23] ============================================================
+[2026-03-07 22:46:23]   US Tax Jobs Telegram Bot
+[2026-03-07 22:46:23]   Bot: @USTaxjobs_bot
+[2026-03-07 22:46:23]   Check interval: every 1 minutes
+[2026-03-07 22:46:23] ============================================================
+[2026-03-07 22:46:23] Loaded 0 previously seen jobs (no duplicates).
+[2026-03-07 22:46:23] Checking for new jobs... (37 keywords x 7 locations)
+[2026-03-07 23:34:21] Manual trigger: send_last_week_jobs()
+[2026-03-07 23:37:09] Manual trigger: send_last_week_jobs()
+[2026-03-07 23:44:17] Manual trigger: send_all_today_jobs()
+[2026-03-08 00:51:12] ============================================================
+[2026-03-08 00:51:12]   US Tax Jobs Telegram Bot
+[2026-03-08 00:51:12]   Bot: @USTaxjobs_bot
+[2026-03-08 00:51:12]   Check interval: every 1 minutes
+[2026-03-08 00:51:12] ============================================================
+[2026-03-08 00:51:12] Loaded 0 previously seen jobs (no duplicates).
+[2026-03-08 00:51:12] Checking for new jobs... (37 keywords x 11 locations)
+[2026-03-08 00:55:21] ============================================================
+[2026-03-08 00:55:21]   US Tax Jobs Telegram Bot
+[2026-03-08 00:55:21]   Bot: @USTaxjobs_bot
+[2026-03-08 00:55:21]   Check interval: every 1 minutes
+[2026-03-08 00:55:21] ============================================================
+[2026-03-08 00:55:21] Loaded 0 previously seen jobs (no duplicates).
+[2026-03-08 00:55:21] Checking for new jobs... (37 keywords x 11 locations)
+[2026-03-08 00:55:37] Found 8 new jobs for today! Sending to Telegram...
+[2026-03-08 00:55:40]   Sent: [LinkedIn] US Tax Return Preparer/Reviewer @ Fidegrity GloBizz Private Limited | Ahmedabad, Gujarat, India
+[2026-03-08 00:55:43]   Sent: [LinkedIn] US Business Tax Manager - 1065 & 1120 @ EazeRecruit HR Private Limited | Ahmedabad, Gujarat, India
+[2026-03-08 00:55:47]   Sent: [LinkedIn] US Tax Compliance - Staff - India - Mumbai @ Plante Moran | Mumbai Metropolitan Region
+[2026-03-08 00:55:50]   Sent: [LinkedIn] Tax Senior - NTO - Mumbai - India @ Plante Moran | Mumbai Metropolitan Region
+[2026-03-08 00:55:53]   Sent: [LinkedIn] Senior Analyst @ Rapha Billing Services | Chennai, Tamil Nadu, India
+[2026-03-08 00:55:57]   Sent: [LinkedIn] Chief Operating Officer @ GKM Global Services Pvt Ltd | Coimbatore, Tamil Nadu, India
+[2026-03-08 00:56:00]   Sent: [LinkedIn] Sr. Accountant, Corporate Accounting (Hybrid in Bangalore) @ Smartsheet | Bengaluru East, Karnataka, India
+[2026-03-08 00:56:04]   Sent: [LinkedIn] Senior Information Technology Recruiter @ Employvision Inc. | Bengaluru, Karnataka, India
+[2026-03-08 00:56:04] Done. Sent 8 new jobs. Total tracked: 8
+[2026-03-08 00:56:04] Sleeping 1 min... (next check after 00:56:04)
+[2026-03-08 00:57:04] Checking for new jobs... (37 keywords x 11 locations)
+[2026-03-08 00:57:21] No new unseen jobs for today. Total tracked: 8
+[2026-03-08 00:57:21] Sleeping 1 min... (next check after 00:57:21)
+[2026-03-08 00:58:21] Checking for new jobs... (37 keywords x 11 locations)
+[2026-03-08 00:58:36] No new unseen jobs for today. Total tracked: 8
+[2026-03-08 00:58:36] Sleeping 1 min... (next check after 00:58:36)
+[2026-03-08 00:59:36] Checking for new jobs... (37 keywords x 11 locations)
+[2026-03-08 00:59:53] No new unseen jobs for today. Total tracked: 8
+[2026-03-08 00:59:53] Sleeping 1 min... (next check after 00:59:53)
+[2026-03-08 01:00:53] Checking for new jobs... (37 keywords x 11 locations)
+[2026-03-08 01:01:27] No new unseen jobs for today. Total tracked: 8
+[2026-03-08 01:01:27] Sleeping 1 min... (next check after 01:01:27)
+[2026-03-08 01:04:20] Manual trigger: send_all_today_jobs()
+[2026-03-08 01:04:36] Manual send-all: sending 26 jobs from the last 2 days...
+[2026-03-08 01:04:40]   Manual sent: [LinkedIn] US Tax Return Preparer/Reviewer @ Fidegrity GloBizz Private Limited
+[2026-03-08 01:04:43]   Manual sent: [LinkedIn] US Business Tax Manager - 1065 & 1120 @ EazeRecruit HR Private Limited
+[2026-03-08 01:04:46]   Manual sent: [LinkedIn] US Tax Compliance - Staff - India - Mumbai @ Plante Moran
+[2026-03-08 01:04:49]   Manual sent: [LinkedIn] Tax Senior - NTO - Mumbai - India @ Plante Moran
+[2026-03-08 01:04:53]   Manual sent: [LinkedIn] Senior Analyst @ Rapha Billing Services
+[2026-03-08 01:04:56]   Manual sent: [LinkedIn] Chief Operating Officer @ GKM Global Services Pvt Ltd
+[2026-03-08 01:04:59]   Manual sent: [LinkedIn] Tax Senior - US Partnership - Hyderabad @ Deloitte
+[2026-03-08 01:05:03]   Manual sent: [LinkedIn] Bench Sales Recruiter @ Static IQ Corp
+[2026-03-08 01:05:04]   Manual send failed: IN_Associate_Tax Tool Support_GTO - SCO_ TRS_Hyderabad
+[2026-03-08 01:05:08]   Manual sent: [LinkedIn] Lead Software Engineer- Full Stack Developer - Hyderabad @ Deloitte
+[2026-03-08 01:05:11]   Manual sent: [LinkedIn] Software Engineer II- Fullstack Developer - Hyderabad/Gurugram @ Deloitte
+[2026-03-08 01:05:15]   Manual sent: [LinkedIn] Accounts Payable Sr Analyst @ PayPal
+[2026-03-08 01:05:18]   Manual sent: [LinkedIn] Partnerships Associate @ Inkle
+[2026-03-08 01:05:22]   Manual sent: [LinkedIn] Sr. Accountant, Corporate Accounting (Hybrid in Bangalore) @ Smartsheet
+[2026-03-08 01:05:25]   Manual sent: [LinkedIn] Partnerships Manager @ Inkle
+[2026-03-08 01:05:29]   Manual sent: [LinkedIn] Senior Information Technology Recruiter @ Employvision Inc.
+[2026-03-08 01:05:32]   Manual sent: [LinkedIn] Senior - US Tax & Assurance @ Intyllus Advisors
+[2026-03-08 01:05:36]   Manual sent: [LinkedIn] Accounting Manager (NetSuite) @ iConsultera
+[2026-03-08 01:05:39]   Manual sent: [LinkedIn] Sr. US Accountant @ Fortis Global Advisors Pvt Ltd
+[2026-03-08 01:05:43]   Manual sent: [LinkedIn] AI Product Manager @ MYCPE ONE
+[2026-03-08 01:05:46]   Manual sent: [LinkedIn] Bench Sales Recruiter (US Shift) @ Orah Consultancy Services
+[2026-03-08 01:05:50]   Manual sent: [LinkedIn] Fund FinOps Manager @ Brookfield
+[2026-03-08 01:05:53]   Manual sent: [LinkedIn] Chartered Accountant @ Mitwa.ai
+[2026-03-08 01:05:57]   Manual sent: [LinkedIn] Information Technology Recruiter @ Infojini Inc
+[2026-03-08 01:06:00]   Manual sent: [LinkedIn] US IT Recruiter @ Reveille Technologies,Inc
+[2026-03-08 01:06:04]   Manual sent: [LinkedIn] US IT RECRUITER @ Galent
+[2026-03-08 01:06:04] Manual send-all done. Sent 25/26 jobs from the last 2 days.
