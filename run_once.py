@@ -67,8 +67,8 @@ BLOCKLIST = re.compile(
 
 INDIAN_TAX_BLOCKLIST = re.compile(
     r"\b("
-    r"gst\s*analyst|gst\s*compliance|gst\s*executive|gst\s*specialist|gst\s*manager|"
-    r"gst\s*consultant|gst\s*filing|gst\s*returns|gst\s*audit|gst\s*advisory|"
+    r"gst|gst\s*analyst|gst\s*compliance|gst\s*executive|gst\s*specialist|gst\s*manager|"
+    r"gst\s*consultant|gst\s*filing|gst\s*returns|gst\s*audit|gst\s*advisory|gstin|"
     r"income\s*tax\s*analyst|income\s*tax\s*consultant|income\s*tax\s*executive|"
     r"direct\s*tax\s*analyst|direct\s*tax\s*consultant|direct\s*tax\s*manager|"
     r"india\s*tax\s*analyst|india\s*tax\s*consultant|domestic\s*tax|"
@@ -78,12 +78,14 @@ INDIAN_TAX_BLOCKLIST = re.compile(
     r"tax\s*litigation|indirect\s*tax\s*specialist|"
     r"tax\s*auditor|tax\s*litigation\s*specialist|transfer\s*pricing|"
     r"tax\s*compliance\s*executive|statutory\s*compliance|"
+    r"provident\s*fund|\bpf\s*(?:compliance|filing|deduction|withdrawal)|\besi\b|epfo|"
+    r"professional\s*tax|labour\s*welfare\s*fund|"
     r"itr|itr-1|itr-2|itr-3|itr-4|itr-5|itr-6|itr-7|"
     r"form\s*16|form\s*16a|form\s*24q|"
-    r"pan\s*number|aadhar|aadhaar|cin|gstin|"
+    r"pan\s*number|aadhar|aadhaar|\bcin\b|"
     r"goods\s*and\s*services\s*tax|section\s*80|fy20[0-9]{2}|ay20[0-9]{2}|"
     r"tds|tcs|advance\s*tax|challan|saral|"
-    r"indian\s*tax|india\s*tax|ato"
+    r"indian\s*tax|india\s*tax"
     r")\b",
     re.IGNORECASE,
 )
@@ -286,8 +288,12 @@ def _is_us_location(job):
 
 
 def _has_mandatory_tax_and_signals(blob, min_signals=2):
-    """Tax mandatory + at least min_signals tax/testing keyword signals."""
+    """Tax mandatory + at least one REQUIRED_TAX_SIGNAL (product/e-file/1040/etc.)
+    + min_signals total generic testing signals. Prevents generic QA/analyst jobs
+    that merely mention the word "tax" in passing from qualifying."""
     if not re.search(r"\btax\b", blob, re.IGNORECASE):
+        return False
+    if not REQUIRED_TAX_SIGNAL.search(blob):
         return False
     signals = set(_TAX_TESTING_SIGNALS.findall(blob.lower()))
     signals.add("tax")
@@ -436,13 +442,19 @@ def is_tax_software_testing_job(job):
         return False
 
     matched = _keyword_hits(blob, TESTING_KEYWORDS)
-    if len(matched) >= 1 and TESTING_SIGNAL.search(blob) and re.search(r"\btax\b", blob):
+    if (
+        len(matched) >= 2
+        and TESTING_SIGNAL.search(blob)
+        and re.search(r"\btax\b", blob)
+        and _has_required_tax_signal(blob)
+    ):
         print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: {matched}")
         return True
     return False
 
 
 def _mark_run_complete(state):
+    state["last_run_at_ist"] = _ist_now().isoformat()
     state["last_run_at"] = datetime.utcnow().isoformat()
     save_state(state)
 
@@ -479,22 +491,31 @@ def _job_posted_ist(job):
 
 def _cycle_cutoff_ist(state):
     """Jobs must be posted after last successful run (≈ last hour)."""
-    last = (state.get("last_run_at") or "").strip()
     now = _ist_now()
-    if last:
+    last_ist = (state.get("last_run_at_ist") or "").strip()
+    if last_ist:
         try:
-            return datetime.fromisoformat(last[:19]) + IST
+            return datetime.fromisoformat(last_ist[:19])
+        except Exception:
+            pass
+    # Backward-compat: old state files only stored last_run_at as raw UTC.
+    last_utc = (state.get("last_run_at") or "").strip()
+    if last_utc:
+        try:
+            return datetime.fromisoformat(last_utc[:19]) + IST
         except Exception:
             pass
     return now - timedelta(hours=1)
 
 
 def _passes_post_window(job, cutoff_ist=None):
-    """Today (IST) only — seen_jobs dedupe prevents repeat posts."""
+    """Job posted after last successful run (cutoff)."""
+    if not cutoff_ist:
+        cutoff_ist = _ist_now() - timedelta(hours=1)
     dt = _job_posted_ist(job)
     if not dt:
         return False
-    return dt.date() == _ist_now().date()
+    return dt >= cutoff_ist
 
 
 def load_state():
@@ -705,9 +726,11 @@ def main():
         log("Bot is PAUSED. Send /resume to restart.")
         return
 
-    # Calculate time window: only fetch jobs since last run (+ 5 min buffer)
-    since_seconds = getattr(config, "SCRAPE_WINDOW_SECONDS", 86400)
-    log(f"Fetch window: {since_seconds // 3600} hours")
+    # Dynamic scrape window: fetch only jobs since last successful run (approx. 1 hour for hourly runs)
+    cutoff_ist = _cycle_cutoff_ist(state)
+    now_ist = _ist_now()
+    since_seconds = max(300, int((now_ist - cutoff_ist).total_seconds()))  # min 5 min
+    log(f"Fetch window: {since_seconds}s ({since_seconds // 60}m) — since last run at {cutoff_ist.strftime('%H:%M IST')}")
 
     seen = load_seen()
     log(f"Loaded {len(seen)} previously seen jobs.")
@@ -753,9 +776,9 @@ def main():
     log(f"Tax Software Testing relevant: {len(tax_software_testing_jobs)} out of {len(india_jobs)} India jobs.")
 
     cutoff_ist = _cycle_cutoff_ist(state)
-    log(f"Post window: today IST only (cutoff ref {cutoff_ist.strftime('%Y-%m-%d %H:%M IST')})")
-    fresh_jobs = [j for j in tax_software_testing_jobs if _passes_post_window(j)]
-    log(f"Posted today: {len(fresh_jobs)} (from {len(tax_software_testing_jobs)} matched)")
+    log(f"Post window: since last run at {cutoff_ist.strftime('%Y-%m-%d %H:%M IST')}")
+    fresh_jobs = [j for j in tax_software_testing_jobs if _passes_post_window(j, cutoff_ist)]
+    log(f"Posted since cutoff: {len(fresh_jobs)} (from {len(tax_software_testing_jobs)} matched)")
 
     new_jobs = [j for j in fresh_jobs if not _is_seen(j, seen)]
     new_jobs.sort(key=lambda j: str(j.get("posted") or j.get("fetched_at") or ""))
