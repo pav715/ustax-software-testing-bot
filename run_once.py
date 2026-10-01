@@ -43,203 +43,52 @@ def _check_telegram():
     except Exception as e:
         return False, str(e)
 
-BLOCKLIST = re.compile(
-    r"\b("
-    r"recruiter|recruitment|talent\s*acquisition|bench\s*sales|"
-    r"us\s*it\s*recruiter|it\s*recruiter|"
-    r"software\s*engineer(?!\s*tax)|software\s*developer(?!\s*tax)|"
-    r"payroll(?!\s*tax)|accounts\s*payable|accounts\s*receivable|"
-    r"statutory\s*audit|business\s*development|sales\s*executive|"
-    r"\bgst\b|goods\s*and\s*services\s*tax|gstn|gst\s*compliance|gst\s*specialist|gst\s*manager|gst\s*consultant|gst\s*filing|gst\s*returns|gst\s*audit|gst\s*advisory|"
-    r"income\s*tax\s*(?!withholding)|income\s*tax\s*consultant|income\s*tax\s*executive|"
-    r"direct\s*tax(?!\s*analyst\s*(?:us|federal|state))|india\s*tax|domestic\s*tax|indian\s*tax|"
-    r"\btds\b|\btcs\b|tax\s*deducted|tax\s*collected|tds\s*analyst|tds\s*filing|"
-    r"indirect\s*tax(?!\s*analyst\s*(?:us|federal))|"
-    r"\bvat\b(?!\s*us)|service\s*tax|excise\s*duty|customs\s*duty|"
-    r"transfer\s*pricing|tax\s*litigation|"
-    r"chartered\s*accountant|ca\s*article|ca\s*analyst|"
-    r"(?<!us\s)(?<!federal\s)finance\s*analyst(?!\s*us)|accounts\s*analyst|^accountant$|"
-    r"financial\s*analyst(?!\s*(?:us|tax))|finance\s*executive|accounts\s*executive|"
-    r"tax\s*auditor|statutory\s*compliance|tax\s*compliance\s*executive(?!\s*us)"
-    r")\b",
-    re.IGNORECASE,
-)
-
-INDIAN_TAX_BLOCKLIST = re.compile(
-    r"\b("
-    r"gst|gst\s*analyst|gst\s*compliance|gst\s*executive|gst\s*specialist|gst\s*manager|"
-    r"gst\s*consultant|gst\s*filing|gst\s*returns|gst\s*audit|gst\s*advisory|gstin|"
-    r"income\s*tax\s*analyst|income\s*tax\s*consultant|income\s*tax\s*executive|"
-    r"direct\s*tax\s*analyst|direct\s*tax\s*consultant|direct\s*tax\s*manager|"
-    r"india\s*tax\s*analyst|india\s*tax\s*consultant|domestic\s*tax|"
-    r"tds\s*analyst|tds\s*compliance|tcs\s*analyst|tds\s*executive|tds\s*filing|"
-    r"indirect\s*tax\s*analyst|indirect\s*tax\s*consultant|indirect\s*tax\s*manager|"
-    r"vat\s*analyst|service\s*tax|excise\s*duty|customs\s*duty|"
-    r"tax\s*litigation|indirect\s*tax\s*specialist|"
-    r"tax\s*auditor|tax\s*litigation\s*specialist|transfer\s*pricing|"
-    r"tax\s*compliance\s*executive|statutory\s*compliance|"
-    r"provident\s*fund|\bpf\s*(?:compliance|filing|deduction|withdrawal)|\besi\b|epfo|"
-    r"professional\s*tax|labour\s*welfare\s*fund|"
-    r"itr|itr-1|itr-2|itr-3|itr-4|itr-5|itr-6|itr-7|"
-    r"form\s*16|form\s*16a|form\s*24q|"
-    r"pan\s*number|aadhar|aadhaar|\bcin\b|"
-    r"goods\s*and\s*services\s*tax|section\s*80|fy20[0-9]{2}|ay20[0-9]{2}|"
-    r"tds|tcs|advance\s*tax|challan|saral|"
-    r"indian\s*tax|india\s*tax"
-    r")\b",
-    re.IGNORECASE,
-)
-
-# Top 50 titles + 100 keywords — tax software testing only
-TESTING_KEYWORDS = [
-    # E-File / ATS / Schema (1–25)
-    "ats", "e-file", "efile", "ats submission", "e-file approval", "print approval",
-    "e-file compliance", "print compliance", "state e-file", "federal e-file",
-    "ats test client", "e-file authorization", "dor approval", "mef", "modernized e-file",
-    "e-file diagnostics", "e-file schema", "e-file module", "electronic filing",
-    "state authority approval", "xml schema", "xsd schema", "schema validation",
-    "schema mapping", "xml tagging",
-    # Tax Software (26–50)
+US_TAX_KEYWORDS = [
+    # Tax Forms (1–25)
+    "form 1040", "form 1040nr", "form 1040sr", "form 1041", "form 1120", "form 1120s",
+    "form 1065", "form 990", "form 1099", "w-2", "w-4", "schedule a", "schedule b",
+    "schedule c", "schedule d", "schedule e", "schedule f", "schedule k-1", "schedule se",
+    "form 2441", "form 8863", "form 8949", "form 1098", "form 1095", "1040 preparation",
+    # IRS / Regulatory (26–40)
+    "irs", "irs guidelines", "irs regulations", "irs compliance", "department of revenue",
+    "dor", "federal tax", "state tax", "tax compliance", "tax law", "tax code",
+    "tax reform", "tax withholding", "tax liability", "tax deductions",
+    # Preparation Process (41–55)
+    "tax preparation", "tax return preparation", "tax filing", "tax review", "tax reviewer",
+    "tax return review", "quality review", "tax advisory", "client returns", "tax planning",
+    "tax research", "tax compliance review", "return review", "tax processing", "tax engagement",
+    # Tax Software (56–70)
     "lacerte", "proseries", "gosystem", "onesource", "ultratax", "cch axcess",
     "prosystem fx", "drake", "atx", "taxwise", "taxact", "taxslayer", "proconnect",
-    "crosslink", "gosystem tax rs", "tax software", "tax software qa", "tax form software",
-    "tax platform", "tax system", "tax application", "tax tool", "tax engine",
-    "tax solution", "filing software",
-    # QA / Testing — tax context required via filter (51–70)
-    "tax qa", "tax testing", "tax tester", "tax software testing", "tax software qa",
-    "manual testing", "regression testing", "functional testing", "uat",
-    "user acceptance testing", "test cases", "test scenarios", "bug tracking",
-    "defect management", "pre-production testing", "post-production testing",
-    "compliance testing", "software validation", "end-to-end testing",
-    "integration testing", "smoke testing", "sanity testing", "quality assurance",
-    # Tax Forms (71–80)
-    "form 1040", "form 1041", "form 1120", "form 1120s", "form 1065", "form 990",
-    "schedule k-1", "individual tax", "corporate tax", "partnership tax",
-    # Tools / Tech (81–90)
-    "lasermap", "2d barcode", "xmlspy", "altova xmlspy",
-    # Regulatory / Compliance (91–100)
-    "tax compliance", "regulatory compliance", "tax form development", "filing product",
-    "government liaison", "state authority", "irs compliance", "dor", "tax law changes",
-    "compliance qa",
+    "crosslink", "h&r block",
+    # Entity Types (71–80)
+    "individual tax", "corporate tax", "partnership tax", "s-corporation", "fiduciary tax",
+    "non-resident tax", "trust tax", "estate tax", "exempt organization", "self-employed tax",
+    # Income Types (81–90)
+    "w-2 income", "1099 income", "rental income", "business income", "capital gains",
+    "dividend income", "interest income", "self-employment income", "foreign income", "passive income",
+    # Skills/Process (91–100)
+    "regulatory compliance", "multi-state filing", "federal compliance", "state compliance",
+    "tax deadline", "tax documentation", "client interaction", "tax strategy", "tax accuracy",
     # Title keywords (Top 50 roles)
-    "tax software qa analyst", "us tax software qa analyst", "tax software tester",
-    "tax qa engineer", "senior tax qa analyst", "tax qa specialist",
-    "tax software quality engineer", "us tax qa engineer", "tax quality assurance analyst",
-    "senior tax software qa analyst", "e-file analyst", "e-file qa analyst",
-    "e-file compliance analyst", "e-file specialist", "xml schema analyst",
-    "tax schema analyst", "ats analyst", "schema validation analyst", "tax schema developer",
-    "regulatory qa analyst", "regulatory qa engineer", "tax regulatory analyst",
-    "compliance qa analyst", "tax compliance qa analyst", "form qa analyst",
-    "tax form qa analyst", "tax form tester", "tax compliance tester",
-    "regulatory compliance qa", "tax manual test engineer", "tax functional qa analyst",
-    "tax functional test analyst", "tax regression test analyst", "tax uat analyst",
-    "tax test analyst", "tax software test analyst", "tax test engineer", "tax qa tester",
-    "tax qa lead", "tax qa manager", "tax test lead", "tax qa engineer lead",
-    "lead qa e-file analyst", "senior tax qa engineer", "tax qa consultant", "tax test manager",
-    # Expanded titles / products
-    "tax product qa", "tax application qa", "tax platform qa", "tax validation analyst",
-    "tax diagnostics analyst", "print and efile", "state e-file", "federal e-file",
-    "electronic filing", "dor approval", "ats test client", "xsd schema", "xml validation",
-    "mef qa", "mef analyst", "irs compliance qa", "filing product qa", "compliance testing tax",
-    "cch axcess", "ultratax", "drake tax", "prosystem fx", "proconnect", "vertex", "avalara",
-    "wolters kluwer", "thomson reuters", "tax integration test", "tax end to end",
-    "tax smoke test", "tax sanity test", "principal tax qa", "tax software validation",
+    "us tax preparer", "tax preparer", "senior tax preparer", "individual tax preparer",
+    "tax return preparer", "tax preparation specialist", "tax filing specialist",
+    "tax preparation analyst", "tax return specialist", "federal tax preparer",
+    "tax analyst", "us tax analyst", "senior tax analyst", "tax compliance analyst",
+    "us tax compliance analyst", "federal tax analyst", "state tax analyst",
+    "tax research analyst", "tax technical analyst", "tax operations analyst",
+    "tax reviewer", "senior tax reviewer", "tax review analyst", "tax quality reviewer",
+    "tax return reviewer", "tax compliance reviewer", "tax audit reviewer",
+    "tax technical reviewer", "qa associate us tax forms", "tax senior reviewer",
+    "tax associate", "senior tax associate", "tax staff associate", "us tax associate",
+    "tax associate analyst", "tax associate consultant", "tax associate specialist",
+    "junior tax associate", "tax process associate", "tax compliance associate",
+    "tax consultant", "us tax consultant", "senior tax consultant", "tax advisory consultant",
+    "tax compliance consultant", "tax technology consultant", "tax planning consultant",
+    "tax transformation consultant", "tax digital consultant", "tax process consultant",
+    # US Tax context
+    "us tax", "us taxation", "u.s. tax", "enrolled agent", "cpa tax",
 ]
-
-# Required signal — at least ONE must be present (not product names alone)
-REQUIRED_TAX_SIGNAL = re.compile(
-    r"\b("
-    r"tax\s*software|tax\s*(?:qa|testing|tester)|"
-    r"\bats\b|automated\s*test\s*system|"
-    r"e[\s-]*file|efile|"
-    r"\bxml\b|xml\s*schema|xsd|"
-    r"1040|form\s*1040|"
-    r"\bdor\b|department\s*of\s*revenue|"
-    r"\bmef\b|modernized\s*e[\s-]*file|"
-    r"lacerte|proseries|gosystem|ultratax|onesource|cch\s*axcess|drake|proconnect|prosystem"
-    r")\b",
-    re.IGNORECASE,
-)
-
-TESTING_SIGNAL = re.compile(
-    r"\b("
-    r"testing|tester|qa|quality|validation|diagnostics|"
-    r"e[\s-]*file|efile|ats|schema|xml|xsd|mef|regulatory|compliance|"
-    r"automated\s*test|test\s*case|test\s*client|test\s*scenario|bug|defect|"
-    r"manual\s*test|functional\s*test|regression|uat|smoke|sanity|integration"
-    r")\b",
-    re.IGNORECASE,
-)
-
-# Pure IT testing — block only when no tax software context
-GENERIC_IT_BLOCKLIST = re.compile(
-    r"\b("
-    r"\bsdet\b|selenium|cypress|playwright|appium|"
-    r"mobile\s*testing|web\s*testing|api\s*testing|performance\s*testing|"
-    r"devops|full\s*stack|\.net\s*testing|java\s*developer"
-    r")\b",
-    re.IGNORECASE,
-)
-
-# Generic QA titles (31–50) — need tax/e-file/schema signal (no variable-width lookbehind)
-GENERIC_QA_TITLE = re.compile(
-    r"\b("
-    r"manual\s*test\s*engineer|functional\s*(?:qa|test)\s*analyst|"
-    r"regression\s*test\s*analyst|\buat\s*analyst|"
-    r"test\s*analyst|software\s*test\s*analyst|software\s*tester|"
-    r"test\s*engineer|qa\s*tester|qa\s*lead|senior\s*qa\s*analyst|"
-    r"qa\s*manager|test\s*lead|qa\s*engineer\s*lead|"
-    r"senior\s*qa\s*engineer|qa\s*consultant|test\s*manager"
-    r")\b",
-    re.IGNORECASE,
-)
-
-
-def _is_generic_qa_title(title):
-    """Generic IT QA title without tax/e-file in the title itself."""
-    if not title or not GENERIC_QA_TITLE.search(title):
-        return False
-    t = title.lower()
-    if re.search(r"\btax\b", t):
-        return False
-    if re.search(r"e[\s-]*file|efile", t):
-        return False
-    return True
-
-TESTING_ROLE_TITLE = re.compile(
-    r"\b("
-    # Tax Software QA (1–10)
-    r"(?:us|u\.s\.|senior)?\s*tax\s*software\s*(?:qa|quality|testing|tester)\s*(?:analyst|engineer|specialist)?|"
-    r"tax\s*software\s*(?:tester|quality\s*engineer)|"
-    r"(?:senior|us|u\.s\.)?\s*tax\s*qa\s*(?:analyst|engineer|specialist)|"
-    r"tax\s*quality\s*assurance\s*analyst|senior\s*tax\s*software\s*qa\s*analyst|"
-    # E-File / Schema (11–20)
-    r"e[\s-]*file\s*(?:analyst|qa\s*analyst|compliance\s*analyst|specialist)|"
-    r"xml\s*schema\s*analyst|tax\s*schema\s*(?:analyst|developer)|"
-    r"ats\s*analyst|schema\s*validation\s*analyst|"
-    # Regulatory QA (21–30)
-    r"(?:tax\s*)?regulatory\s*(?:qa|compliance)\s*(?:analyst|engineer)|"
-    r"tax\s*regulatory\s*analyst|(?:tax\s*)?compliance\s*qa\s*analyst|"
-    r"tax\s*compliance\s*qa\s*analyst|form\s*qa\s*analyst|tax\s*form\s*qa\s*analyst|"
-    r"tax\s*form\s*tester|tax\s*compliance\s*tester|regulatory\s*compliance\s*qa|"
-    # Manual / Leadership with Tax prefix (31–50)
-    r"tax\s*(?:manual\s*test|functional\s*(?:qa|test)|regression\s*test|uat|test|qa)\s*(?:engineer|analyst|tester|lead|manager)?|"
-    r"tax\s*software\s*test\s*analyst|tax\s*test\s*(?:engineer|analyst|lead|manager)|"
-    r"tax\s*qa\s*(?:lead|manager|consultant|tester)|"
-    r"lead\s*qa\s*e[\s-]*file\s*analyst|senior\s*tax\s*qa\s*(?:analyst|engineer)|"
-    r"tax\s*qa\s*engineer\s*lead|"
-    # Core tax software testing
-    r"tax\s*(?:software|application|product)\s*(?:testing|tester|qa|validation)|"
-    r"qa\s*(?:&|and)?\s*e[\s-]*file|e[\s-]*file\s*(?:&|and)?\s*qa|"
-    r"schema\s*(?:validation|testing|analyst)|xml\s*(?:schema|testing|validation)|"
-    r"tax\s*(?:schema|xml|e[\s-]*file|ats|validation|diagnostics)|filing\s*product|"
-    r"tax\s*(?:product|application|platform)\s*qa|"
-    r"(?:lacerte|proseries|gosystem|ultratax|onesource|cch\s*axcess|drake)\s*qa|"
-    r"print\s*(?:and|&)\s*e[\s-]*file|state\s*e[\s-]*file|federal\s*e[\s-]*file|"
-    r"mef\s*(?:qa|analyst)?|tax\s*validation\s*analyst|tax\s*diagnostics\s*analyst"
-    r")\b",
-    re.IGNORECASE,
-)
 
 INDIA_LOCATION_KEYWORDS = [
     "india", "hyderabad", "bangalore", "bengaluru", "chennai", "mumbai", "pune", "delhi",
@@ -253,51 +102,99 @@ FOREIGN_LOCATION_KEYWORDS = [
     "dubai", "germany", "france",
 ]
 
-US_STATE_LOCATION = re.compile(
+BLOCKLIST = re.compile(
     r"\b("
-    r"alabama|alaska|arizona|arkansas|california|colorado|connecticut|delaware|florida|georgia|"
-    r"hawaii|idaho|illinois|indiana|iowa|kansas|kentucky|louisiana|maine|maryland|massachusetts|"
-    r"michigan|minnesota|mississippi|missouri|montana|nebraska|nevada|new\s*hampshire|new\s*jersey|"
-    r"new\s*mexico|new\s*york|north\s*carolina|north\s*dakota|ohio|oklahoma|oregon|pennsylvania|"
-    r"rhode\s*island|south\s*carolina|south\s*dakota|tennessee|texas|utah|vermont|virginia|"
-    r"washington|west\s*virginia|wisconsin|wyoming|"
-    r"AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|"
-    r"NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY"
+    r"recruiter|recruitment|talent\s*acquisition|bench\s*sales|"
+    r"us\s*it\s*recruiter|it\s*recruiter|"
+    r"software\s*engineer(?!\s*tax)|software\s*developer(?!\s*tax)|"
+    r"selenium|automation\s*tester|manual\s*tester|"
+    r"payroll(?!\s*tax)|accounts\s*payable|accounts\s*receivable|"
+    r"statutory\s*audit|business\s*development|sales\s*executive|"
+    # Indian tax roles - GST (1-10)
+    r"\bgst\b|goods\s*and\s*services\s*tax|gstn|gst\s*compliance|gst\s*specialist|gst\s*manager|gst\s*consultant|gst\s*filing|gst\s*returns|gst\s*audit|gst\s*advisory|"
+    # Income Tax India (11-20)
+    r"income\s*tax\s*(?!withholding)|income\s*tax\s*consultant|income\s*tax\s*executive|"
+    r"direct\s*tax(?!\s*analyst\s*(?:us|federal|state))|india\s*tax|domestic\s*tax|indian\s*tax|"
+    # TDS / TCS (21-25)
+    r"\btds\b|\btcs\b|tax\s*deducted|tax\s*collected|tds\s*analyst|tds\s*filing|"
+    # Indirect Tax India (26-35)
+    r"indirect\s*tax(?!\s*analyst\s*(?:us|federal))|"
+    r"\bvat\b(?!\s*us)|service\s*tax|excise\s*duty|customs\s*duty|"
+    r"transfer\s*pricing|tax\s*litigation|"
+    # CA / Finance Related (36-45)
+    r"chartered\s*accountant|ca\s*article|ca\s*analyst|"
+    r"(?<!us\s)(?<!federal\s)finance\s*analyst(?!\s*us)|accounts\s*analyst|^accountant$|"
+    r"financial\s*analyst(?!\s*(?:us|tax))|finance\s*executive|accounts\s*executive|"
+    # Other Indian Tax (46-50)
+    r"tax\s*auditor|statutory\s*compliance|tax\s*compliance\s*executive(?!\s*us)"
     r")\b",
     re.IGNORECASE,
 )
 
-_TAX_TESTING_SIGNALS = re.compile(
-    r"\b(tax|qa|test|quality|software|e[\s-]?file|schema|ats|validation|analyst|testing)\b",
+# STRICT: Reject all Indian tax roles - no US Tax jobs should have these keywords
+# Title match — US Tax roles (primary accept rule)
+US_TAX_TITLE = re.compile(
+    r"\b("
+    # Preparer (1–10)
+    r"(?:us|u\.s\.|federal|individual|senior)\s*tax\s*prepar(?:er|ation)|"
+    r"tax\s*prepar(?:er|ation)|tax\s*return\s*prepar(?:er|ation)?|"
+    r"tax\s*filing\s*specialist|tax\s*preparation\s*(?:specialist|analyst)|"
+    r"tax\s*return\s*specialist|"
+    # Analyst (11–20)
+    r"(?:us|u\.s\.|federal|state|senior)\s*tax\s*analyst|"
+    r"tax\s*(?:compliance|research|technical|operations)\s*analyst|"
+    r"tax\s*analyst|"
+    # Reviewer (21–30)
+    r"(?:senior|quality|return|compliance|audit|technical)?\s*tax\s*review(?:er|ing)?|"
+    r"tax\s*review\s*analyst|tax\s*senior\s*reviewer|"
+    r"qa\s*associate.{0,20}(?:us\s*)?tax\s*forms|"
+    # Associate (31–40)
+    r"(?:us|u\.s\.|senior|junior|staff|process|compliance)\s*tax\s*associate|"
+    r"tax\s*associate(?:\s*(?:analyst|consultant|specialist))?|"
+    # Consultant (41–50)
+    r"(?:us|u\.s\.|senior)\s*tax\s*consultant|"
+    r"tax\s*(?:advisory|compliance|technology|planning|transformation|digital|process)\s*consultant|"
+    r"tax\s*consultant|"
+    # US Tax general
+    r"u\.?\s*s\.?\s*tax(?:ation)?|us\s*tax(?:ation)?|"
+    r"enrolled\s*agent|cpa\s*(?:us\s*)?tax|tax\s*cpa"
+    r")\b",
+    re.IGNORECASE,
+)
+
+INDIAN_TAX_BLOCKLIST = re.compile(
+    r"\b("
+    # GST Related (1-10) — includes bare "gst" now
+    r"gst|gst\s*analyst|gst\s*compliance|gst\s*executive|gst\s*specialist|gst\s*manager|"
+    r"gst\s*consultant|gst\s*filing|gst\s*returns|gst\s*audit|gst\s*advisory|gstin|"
+    # Income Tax India (11-20)
+    r"income\s*tax\s*analyst|income\s*tax\s*consultant|income\s*tax\s*executive|"
+    r"direct\s*tax\s*analyst|direct\s*tax\s*consultant|direct\s*tax\s*manager|"
+    r"india\s*tax\s*analyst|india\s*tax\s*consultant|domestic\s*tax|"
+    # TDS / TCS (21-25)
+    r"tds\s*analyst|tds\s*compliance|tcs\s*analyst|tds\s*executive|tds\s*filing|"
+    # Indirect Tax India (26-35)
+    r"indirect\s*tax\s*analyst|indirect\s*tax\s*consultant|indirect\s*tax\s*manager|"
+    r"vat\s*analyst|service\s*tax|excise\s*duty|customs\s*duty|"
+    r"tax\s*litigation|indirect\s*tax\s*specialist|"
+    # Other Indian Tax (46-50)
+    r"tax\s*auditor|tax\s*litigation\s*specialist|transfer\s*pricing|"
+    r"tax\s*compliance\s*executive|statutory\s*compliance|"
+    # Indian payroll / statutory terms not tax-titled but India-only context
+    r"provident\s*fund|\bpf\s*(?:compliance|filing|deduction|withdrawal)|\besi\b|epfo|"
+    r"professional\s*tax|labour\s*welfare\s*fund|"
+    # Keywords that indicate Indian context
+    r"itr|itr-1|itr-2|itr-3|itr-4|itr-5|itr-6|itr-7|"
+    r"form\s*16|form\s*16a|form\s*24q|"
+    r"pan\s*number|aadhar|aadhaar|\bcin\b|"
+    r"goods\s*and\s*services\s*tax|section\s*80|fy20[0-9]{2}|ay20[0-9]{2}|"
+    r"tds|tcs|advance\s*tax|challan|saral|"
+    r"indian\s*tax|india\s*tax"
+    r")\b",
     re.IGNORECASE,
 )
 
 
-def _is_us_location(job):
-    """Reject US state / USA jobs (common on software channel from broad LinkedIn results)."""
-    loc = (job.get("location") or "").lower()
-    if not loc.strip():
-        return False
-    if any(kw in loc for kw in FOREIGN_LOCATION_KEYWORDS):
-        if not any(kw in loc for kw in INDIA_LOCATION_KEYWORDS):
-            return True
-    if US_STATE_LOCATION.search(loc):
-        if not any(kw in loc for kw in INDIA_LOCATION_KEYWORDS):
-            return True
-    return False
-
-
-def _has_mandatory_tax_and_signals(blob, min_signals=2):
-    """Tax mandatory + at least one REQUIRED_TAX_SIGNAL (product/e-file/1040/etc.)
-    + min_signals total generic testing signals. Prevents generic QA/analyst jobs
-    that merely mention the word "tax" in passing from qualifying."""
-    if not re.search(r"\btax\b", blob, re.IGNORECASE):
-        return False
-    if not REQUIRED_TAX_SIGNAL.search(blob):
-        return False
-    signals = set(_TAX_TESTING_SIGNALS.findall(blob.lower()))
-    signals.add("tax")
-    return len(signals) >= min_signals
 
 
 def _keyword_hits(text, keywords):
@@ -319,9 +216,6 @@ def is_india_location(job):
 
     # Rule 1: India search location always passes
     if search_loc and any(kw in search_loc for kw in INDIA_LOCATION_KEYWORDS):
-        # But reject if job location is explicitly US state
-        if loc and _is_us_location({"location": loc}):
-            return False
         return True
 
     if not loc.strip():
@@ -348,24 +242,13 @@ def is_india_location(job):
         return "india" in context or any(kw in context for kw in INDIA_LOCATION_KEYWORDS)
 
     # Rule 5: Reject onsite US state jobs
-    if _is_us_location(job):
+    us_states = ["ohio", "new york", "california", "texas", "florida", "illinois",
+                 "pennsylvania", "georgia", "north carolina", "michigan", "arizona",
+                 "colorado", "washington", "ny", "ca", "tx", "fl", "il", "pa", "ga", "nc", "mi", "az", "co", "wa", "oh"]
+    if any(state in loc for state in us_states):
         return False
 
     return False
-
-
-
-def _passes_search_trust(job):
-    """Trust LinkedIn tax/QA search only when title+company show tax + 2 other signals."""
-    sk_l = (job.get("search_keyword") or "").lower()
-    title = (job.get("title") or "").lower()
-    company = (job.get("company") or "").lower()
-    blob = f"{title} {company}"
-    if not sk_l or "tax" not in sk_l:
-        return False
-    if INDIAN_TAX_BLOCKLIST.search(title) or BLOCKLIST.search(title):
-        return False
-    return _has_mandatory_tax_and_signals(blob)
 
 
 def _passes_early_filter(job, role_title_pattern):
@@ -374,31 +257,21 @@ def _passes_early_filter(job, role_title_pattern):
     sk = job.get("search_keyword") or ""
     title_l = title.lower()
     company_l = company.lower()
-    blob = f"{title_l} {company_l}"
     if INDIAN_TAX_BLOCKLIST.search(title_l) or INDIAN_TAX_BLOCKLIST.search(company_l):
         return False
     if BLOCKLIST.search(title_l) or BLOCKLIST.search(company_l):
         return False
-    if not re.search(r"\btax\b", blob):
-        return False
-    if sk and "tax" in sk.lower() and _title_matches_search(title, sk):
+    if re.search(r"\btax\b", title_l):
         return True
-    if role_title_pattern.search(title_l) and re.search(r"\btax\b", title_l):
+    if sk and _title_matches_search(title, sk):
         return True
-    if re.search(r"\btax\b", title_l) and re.search(
-        r"\b(test|qa|quality|software|automation|analyst|associate|validation|e[\s-]?file|schema|ats)\b",
-        title_l,
-    ):
+    if role_title_pattern.search(title_l):
         return True
     return False
 
 
-def _has_required_tax_signal(text):
-    """Must have tax software, ATS, e-file, XML, 1040, or DOR."""
-    return bool(REQUIRED_TAX_SIGNAL.search(text))
-
-
 def _title_matches_search(title, keyword):
+    """Require the domain word AND at least one other substantive keyword word in the title."""
     if not title or not keyword:
         return False
     tl = title.lower()
@@ -407,15 +280,20 @@ def _title_matches_search(title, keyword):
         "mortgage", "loan", "credit", "tax", "servicing", "underwrit",
         "financial", "compliance", "testing", "software", "banking", "escrow",
     )
-    for d in domain_words:
-        if d in kw_l:
-            return d in tl
     words = [w for w in re.findall(r"[a-z]+", kw_l) if len(w) > 3]
+    matched_domain = next((d for d in domain_words if d in kw_l), None)
+    if matched_domain:
+        if matched_domain not in tl:
+            return False
+        other_words = [w for w in words if w not in matched_domain and matched_domain not in w]
+        if not other_words:
+            return True
+        return any(w in tl for w in other_words)
     return bool(words) and all(w in tl for w in words)
 
 
-def is_tax_software_testing_job(job):
-    """Tax mandatory + 3 tax/testing signals; no generic QA/US-only roles."""
+def is_us_tax_job(job):
+    """Accept US Tax titled roles first; then keyword match in full text."""
     desc = (job.get("description") or "").lower()
     title = (job.get("title") or "").lower()
     company = (job.get("company") or "").lower()
@@ -423,31 +301,34 @@ def is_tax_software_testing_job(job):
 
     if INDIAN_TAX_BLOCKLIST.search(title) or INDIAN_TAX_BLOCKLIST.search(company):
         return False
-    if BLOCKLIST.search(title) or BLOCKLIST.search(company):
-        return False
-    if not _has_mandatory_tax_and_signals(blob):
-        return False
 
-    if _passes_search_trust(job):
-        print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: tax search keyword trust")
+    sk = (job.get("search_keyword") or "")
+    if sk and "tax" in sk.lower() and re.search(r"\btax\b", title):
+        if not BLOCKLIST.search(title) and not INDIAN_TAX_BLOCKLIST.search(blob):
+            if _title_matches_search(title, sk) or US_TAX_TITLE.search(title):
+                print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: search keyword + tax")
+                return True
+
+    if US_TAX_TITLE.search(title):
+        if BLOCKLIST.search(title) or BLOCKLIST.search(company):
+            return False
+        if INDIAN_TAX_BLOCKLIST.search(blob):
+            return False
+        print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: us tax title")
         return True
 
-    if TESTING_ROLE_TITLE.search(title) and re.search(r"\btax\b", title):
-        print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: tax testing title")
-        return True
-
-    if GENERIC_IT_BLOCKLIST.search(blob) and not _has_required_tax_signal(blob):
+    if BLOCKLIST.search(blob):
         return False
-    if _is_generic_qa_title(title) and not re.search(r"\btax\b", title):
+    if INDIAN_TAX_BLOCKLIST.search(blob):
         return False
 
-    matched = _keyword_hits(blob, TESTING_KEYWORDS)
-    if (
-        len(matched) >= 2
-        and TESTING_SIGNAL.search(blob)
-        and re.search(r"\btax\b", blob)
-        and _has_required_tax_signal(blob)
-    ):
+    # Require the literal word "tax" plus at least 2 strong US-tax signals —
+    # prevents generic HR boilerplate ("regulatory compliance", "quality review")
+    # from passing on a single weak keyword hit with no real tax content.
+    if not re.search(r"\btax\b", blob):
+        return False
+    matched = _keyword_hits(blob, US_TAX_KEYWORDS)
+    if len(matched) >= 2:
         print(f"DEBUG: '{job.get('title')}' @ {job.get('company')} matched: {matched}")
         return True
     return False
@@ -630,7 +511,7 @@ def handle_commands(state, stats):
 
             if text.startswith("/status"):
                 reply = (
-                    f"🤖 *US Tax Software Testing Bot — Status*\n\n"
+                    f"🤖 *US Tax Jobs Bot — Status*\n\n"
                     f"{'⏸ PAUSED' if state.get('paused') else '✅ RUNNING'}\n\n"
                     f"📊 *Today ({stats['date']}):*\n"
                     f"• Jobs sent: *{stats['sent']}*\n"
@@ -655,7 +536,7 @@ def handle_commands(state, stats):
 
 def enrich_job(job):
     """Fetch full job description from LinkedIn detail page."""
-    if job.get("description") and len(job["description"]) > 300:
+    if job.get("description") and len(job["description"]) > 200:
         return job
     url = job.get("url", "")
     fetched = False
@@ -702,7 +583,7 @@ def extract_qualification(desc, title):
 
 def main():
     log("=" * 50)
-    log("US Tax Software Testing Bot — LinkedIn Only")
+    log("US Tax Jobs Bot — LinkedIn Only")
     log("=" * 50)
 
     if not config.BOT_TOKEN or not config.CHAT_ID:
@@ -713,8 +594,6 @@ def main():
     log(f"CHAT_ID: {config.CHAT_ID}")
     tg_ok, tg_msg = _check_telegram()
     log(f"Telegram check: {tg_msg}")
-    if not tg_ok:
-        log("WARNING: Telegram getChat failed — posts may not deliver.")
 
     state = load_state()
     stats = load_stats()
@@ -750,46 +629,47 @@ def main():
         log(f"Seed mode: marked {len(jobs)} jobs as seen, sent 0.")
         return
 
+    print(f"DEBUG: Total jobs scraped: {len(jobs)}")
     log(f"Total jobs scraped: {len(jobs)}")
 
     india_jobs = [j for j in jobs if is_india_location(j)]
-    log(f"India jobs: {len(india_jobs)} out of {len(jobs)} total.")
+    log(f"India/Remote: {len(india_jobs)} out of {len(jobs)} total.")
 
-    tax_software_testing_jobs = []
+    us_tax_jobs = []
     enrich_budget = getattr(config, "MAX_ENRICH_PER_CYCLE", 30)
     enriched = 0
     for job in india_jobs:
-        if not _passes_early_filter(job, TESTING_ROLE_TITLE):
+        if not _passes_early_filter(job, US_TAX_TITLE):
             continue
-        if is_tax_software_testing_job(job):
-            tax_software_testing_jobs.append(job)
+        if is_us_tax_job(job):
+            us_tax_jobs.append(job)
             continue
         if enriched >= enrich_budget:
             continue
         job = enrich_job(job)
         enriched += 1
-        if is_tax_software_testing_job(job):
-            tax_software_testing_jobs.append(job)
+        if is_us_tax_job(job):
+            us_tax_jobs.append(job)
 
     log(f"Enriched {enriched} jobs (budget {enrich_budget})")
 
-    log(f"Tax Software Testing relevant: {len(tax_software_testing_jobs)} out of {len(india_jobs)} India jobs.")
+    log(f"US Tax relevant: {len(us_tax_jobs)} out of {len(india_jobs)} India jobs.")
 
     cutoff_ist = _cycle_cutoff_ist(state)
     log(f"Post window: since last run at {cutoff_ist.strftime('%Y-%m-%d %H:%M IST')}")
-    fresh_jobs = [j for j in tax_software_testing_jobs if _passes_post_window(j, cutoff_ist)]
-    log(f"Posted since cutoff: {len(fresh_jobs)} (from {len(tax_software_testing_jobs)} matched)")
+    fresh_jobs = [j for j in us_tax_jobs if _passes_post_window(j, cutoff_ist)]
+    log(f"Posted since cutoff: {len(fresh_jobs)} (from {len(us_tax_jobs)} matched)")
 
     new_jobs = [j for j in fresh_jobs if not _is_seen(j, seen)]
     new_jobs.sort(key=lambda j: str(j.get("posted") or j.get("fetched_at") or ""))
     log(f"New jobs to send: {len(new_jobs)}")
 
     if not new_jobs:
-        log("No new Tax Software Testing jobs this cycle.")
+        log("No new US Tax jobs this cycle.")
         save_seen(seen)
         save_stats(stats)
         _mark_run_complete(state)
-        _write_cycle_report(len(jobs), len(india_jobs), len(tax_software_testing_jobs), 0, 0, len(seen), fresh_today=len(fresh_jobs), telegram_ok=tg_ok, telegram_detail=tg_msg)
+        _write_cycle_report(len(jobs), len(india_jobs), len(us_tax_jobs), 0, 0, len(seen), fresh_today=len(fresh_jobs), telegram_ok=tg_ok, telegram_detail=tg_msg)
         return
 
     if len(new_jobs) > config.MAX_JOBS_PER_CYCLE:
@@ -822,7 +702,7 @@ def main():
     save_seen(seen)
     save_stats(stats)
     _mark_run_complete(state)
-    _write_cycle_report(len(jobs), len(india_jobs), len(tax_software_testing_jobs), len(new_jobs), sent, len(seen), fresh_today=len(fresh_jobs), telegram_ok=tg_ok, telegram_detail=tg_msg)
+    _write_cycle_report(len(jobs), len(india_jobs), len(us_tax_jobs), len(new_jobs), sent, len(seen), fresh_today=len(fresh_jobs), telegram_ok=tg_ok, telegram_detail=tg_msg)
     log(f"Done. Sent {sent} new jobs. Today total: {stats['sent']}. Tracked: {len(seen)}")
 
 
